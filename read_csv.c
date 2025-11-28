@@ -15,6 +15,29 @@
     
 }*/
 
+static void display_channels(t_channel *t)
+{
+    t_channel *aux;
+
+    aux = t;
+    while(aux)
+    {
+        if(aux->name)
+            printf("%s\n", aux->name);
+        /*if(aux->a)
+            printf("a: %i\n", aux->a);
+        if(aux->b)
+            printf("b:%i\n", aux->b);
+        if(aux->c)
+            printf("c:%i\n", aux->c);
+        if(aux->cpm)
+            printf("cpm:%i\n", aux->cpm);
+        if(aux->universe)
+            printf("universe:%i\n", aux->universe);*/
+        aux = aux->next;
+        
+    }
+}
 
 
 static bool retrieve_names(int pos, t_channel *t, int fd)
@@ -73,7 +96,7 @@ static bool retrieve_names(int pos, t_channel *t, int fd)
         aux->next = malloc(sizeof(t_channel));
         if(!aux->next)
         {
-            perror("malloc error populating channel struct");
+            perror("malloc error generating channel struct");
             exit(1);
         }
         /*printf("%s\n", aux->name);
@@ -83,6 +106,8 @@ static bool retrieve_names(int pos, t_channel *t, int fd)
         free(line);
         line = get_next_line(fd);
     }
+    display_channels(t);
+    exit(0);
     return(true);
 }
 
