@@ -15,7 +15,7 @@
     
 }*/
 
-static void display_channels(t_channel *t)
+static void display_channels(t_channel *t) //DEBUGGING ONLY
 {
     t_channel *aux;
 
@@ -24,34 +24,88 @@ static void display_channels(t_channel *t)
     {
         if(aux->name)
             printf("%s\n", aux->name);
-        /*if(aux->a)
-            printf("a: %i\n", aux->a);
-        if(aux->b)
-            printf("b:%i\n", aux->b);
+        if(aux->a)
+            printf("a:%i\n", aux->a);
+        /*if(aux->b)
+            printf("b:%s\n", aux->b);
         if(aux->c)
-            printf("c:%i\n", aux->c);
+            printf("c:%s\n", aux->c);
         if(aux->cpm)
-            printf("cpm:%i\n", aux->cpm);
+            printf("cpm:%s\n", aux->cpm);
         if(aux->universe)
-            printf("universe:%i\n", aux->universe);*/
+            printf("universe:%s\n", aux->universe);*/
         aux = aux->next;
         
     }
 }
 
+static void populate_name(t_channel *aux, char *line, int field_len, int i)
+{
+    int j;
 
-static bool retrieve_names(int pos, t_channel *t, int fd)
+    aux->name = malloc(sizeof(char) * (field_len+1));
+    if(!aux->name)
+    {
+        perror("malloc error populating channel struct (name)\n");
+        exit(1);
+    }
+        
+    j = 0;
+    while(j < field_len)
+    {
+        aux->name[j] = line[i];
+        i++;
+        j++;
+    }
+    aux->name[j] = '\0';
+}
+
+static void populate_a(t_channel *aux, char *line, int field_len, int i)
+{
+    int j;
+    char *s;
+    char *endptr;
+
+    s = malloc(sizeof(char) * (field_len + 1));
+    if(!s)
+    {
+        perror("malloc error populating channel struct (A)\n");
+        exit(1);
+    }        
+    j = 0;
+    while(j < field_len)
+    {
+        s[j] = line[i];
+        i++;
+        j++;
+    }
+    s[j] = '\0';
+    aux->a = strtod(s, &endptr);
+    if(*endptr != '\0' || endptr == s)
+    {
+        printf("parameter A in row %i is not recognized as a numerical value", i);
+        exit(1);
+    }
+}
+
+
+
+
+static bool retrieve_field(int pos, t_channel *t, int fd, char *field)
 {
     int i;
-    int j;
     int k;
+    int iter;
     char *line;
     int commas;
-    int name_len;
+    int field_len;
     t_channel *aux;
 
     aux = t;
     line = get_next_line(fd);
+    printf("%s\n",line);
+    //display_channels(t);
+    iter = 0;
     while(1)
     {
         i = 0;
@@ -68,31 +122,26 @@ static bool retrieve_names(int pos, t_channel *t, int fd)
         if(line[i] == ',')
         {
             free(line);
-            //printf("the loop was broken, i'm out\n");
+            printf("the loop was broken at %i i'm out\n", iter);
             break;        
         }
-        name_len = 0;
+        field_len = 0;
         k = i;
         while(line[k] != ',' && line[k])
         {   
-            name_len++;
+            field_len++;
             k++;
         }
-        //printf("len : %i, char %c\n", name_len, line[i]);
-        aux->name = malloc(sizeof(char) * (name_len+1));
-        if(!aux->name)
-        {
-            perror("malloc error populating names in channel struct\n");
-            exit(1);
+        //printf("len : %i, char %c\n", field_len, line[i]);
+        if(strcmp(field, "name") == 0)
+        {    
+            populate_name(aux, line, field_len, i);
         }
-        j = 0;
-        while(j < name_len)
+        if(strcmp(field, "A") == 0)
         {
-            aux->name[j] = line[i];
-            i++;
-            j++;
+            printf("it does know what it's gotta do\n");
+            populate_a(aux, line, field_len, i);
         }
-        aux->name[j] = '\0';
         aux->next = malloc(sizeof(t_channel));
         if(!aux->next)
         {
@@ -105,9 +154,9 @@ static bool retrieve_names(int pos, t_channel *t, int fd)
         aux->next = NULL;
         free(line);
         line = get_next_line(fd);
+        iter++;
     }
-    display_channels(t);
-    exit(0);
+    //display_channels(t);
     return(true);
 }
 
@@ -142,8 +191,13 @@ t_channel *read_csv(char *filename)
     int i;
     char *line;
     char *needle;
-    bool names;
     int pos;
+    bool names;
+    bool a;
+    /*bool b;
+    bool c;
+    bool cpm;
+    bool universe;*/
     t_channel *t;
 
     fd = open(filename, O_RDONLY);
@@ -155,7 +209,8 @@ t_channel *read_csv(char *filename)
     i = 0;
     t = malloc(sizeof(t_channel));
     names = false;
-    while(1)
+    a = false;
+    while(1 && i < 20)
     {
 		line = get_next_line(fd);
         if (line == NULL)
@@ -164,15 +219,35 @@ t_channel *read_csv(char *filename)
 		}
         //printf("%s\n", line);
 		needle = strstr(line,",Channel,");
-        if(needle && !names)
+        if(!names && needle)
         {    
             //printf("Haystack:%s\nNeedle:%s\n needdle - line: %li\n", line, needle, needle- line);
             pos = locate_pos(needle, line);
             /*printf("pos: %i\nline: %s\n", i, line);
             exit(0);*/
-            names = retrieve_names(pos, t, fd);
+            names = retrieve_field(pos, t, fd, "name");
+            /*display_channels(t);
+            exit(0);*/
+            close(fd);
+            fd = open(filename, O_RDONLY);
+            if(fd < 0)
+            {
+                fprintf(stderr, "Error: cannot open file '%s'\n", filename);
+                exit(1);
+            }
+            line = get_next_line(fd); //careful. This means that the headers cannot be in the first row.
+            //
         }
-        free(line);
+        needle = strstr(line, ",A,");
+        if(!a && needle)
+        {
+            pos = locate_pos(needle, line);
+            a = retrieve_field(pos, t, fd, "A");
+            /*display_channels(t);
+            exit(0);*/            
+        }
+        if(line)
+            free(line);
         i++;
 	}
     //printf("lines %i\n", i);
