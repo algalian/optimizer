@@ -6,7 +6,7 @@ unsigned int n_channels;
 
 int main(int argc, char **argv)
 {
-    t_channel t;
+    t_channel *t;
 
 
     if(argc <= 7)
@@ -17,6 +17,7 @@ int main(int argc, char **argv)
     {
         n_channels = argc;
     }
+    t = NULL;
     read_csv(argv[1], &t);
     logic_engine();
     return(0);

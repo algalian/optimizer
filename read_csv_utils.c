@@ -1,6 +1,20 @@
 #include"optimizer.h"
 
 
+bool is_line_empty(char *s)
+{
+	int i;
+
+	i = 0;
+	while(s[i] && isprint(s[i]))
+		i++;
+	if(i == 0)
+		return(true);
+	return(false);
+	
+}
+
+
 void display_channels(t_channel *t) //DEBUGGING ONLY
 {
     t_channel *aux;

@@ -2,18 +2,7 @@
 
 
 
-/*static bool is_line_empty(char *s)
-{
-	int i;
-
-	i = 0;
-	while(s[i] && isprint(s[i]))
-		i++;
-	if(i == 0)
-		return(true);
-	return(false);
-	
-}*/
+/*
 
 
 
@@ -196,8 +185,8 @@ void retrieve_field(int pos, t_channel *t, int fd, char *field)
 			exit(1);
 		}
 		memset(t->next, 0, sizeof(t_channel));
-		/*printf("%s\n", aux->name);
-		exit(0);*/
+		//printf("%s\n", aux->name);
+		//exit(0);
 		t = t->next;
 		t->next = NULL;
 		free(line);
@@ -217,10 +206,10 @@ void read_csv(char *filename, t_channel *t)
 	bool names;
 	bool a;
 	bool header;
-	/*bool b;
-	bool c;
-	bool cpm;
-	bool universe;*/
+	//bool b;
+	//bool c;
+	//bool cpm;
+	//bool universe;
 
 	fd = open(filename, O_RDONLY);
 	if(fd < 0)
@@ -316,4 +305,102 @@ void read_csv(char *filename, t_channel *t)
 		i++;
 	}
 	close(fd);
+}*/
+
+int move_to_pos(char *line, int pos)
+{
+	int i;
+	int commas;
+
+	i = 0;
+	commas = 0;
+	while(commas <= pos)
+	{
+		if(line[i] == ',')
+		{
+			commas++;
+		}
+		i++;
+		//printf("%i: %c\n", i, line[i]);
+	}
+	return(i);
+}
+
+t_channel *add_channel(t_channel **head)
+{
+	t_channel *new_node;
+	t_channel *tmp;
+
+	new_node = malloc (sizeof(t_channel));
+    if (!new_node)
+	{
+		perror("malloc error creating channel struct\n");
+		exit(1);
+	}
+    new_node->next = NULL;
+    if (*head == NULL) 
+	{
+        *head = new_node;
+    } 
+	else 
+	{
+        tmp = *head;
+        while (tmp->next != NULL)
+            tmp = tmp->next;
+        tmp->next = new_node;
+    }
+    return (new_node);
+}
+
+void build_channels(t_channel **t, int fd, int pos)
+{
+	char *line;
+	int i;
+
+	while(1)
+	{	
+		i = 0;
+		line = get_next_line(fd);
+		i += move_to_pos(line, pos);
+		if(line[i] == ',')// this means no more rows are below
+		{
+			free(line);
+			break; 
+		}
+		add_channel(t);
+	}
+}
+
+void read_csv(char *filename, t_channel **t)
+{
+	int fd;
+	int i;
+	char *line;
+	int pos;
+	char *needle;
+
+	fd = open(filename, O_RDONLY);
+	if(fd < 0)
+	{
+		fprintf(stderr, "Error: cannot open file '%s'\n", filename);
+		exit(1);
+	}
+
+	i = 0;
+	while(1)
+	{
+		if(line == NULL) //TO DO: exit conditions
+		{
+			break;
+		}
+		line = get_next_line(fd);
+		needle = strstr(line,",A,B,C,Nº,Channel,");
+		if(needle)
+		{
+			pos = locate_pos(",Channel,",line);
+			build_channels(t, fd, pos);
+		}
+		i++;
+	}
+
 }
