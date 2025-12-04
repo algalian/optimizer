@@ -6,7 +6,7 @@ NAME		= optimizer
 WINNAME		= optimizer.exe
 CC			= gcc
 WINCC		= x86_64-w64-mingw32-gcc
-CFLAGS		= -Wall -D BUFFER_SIZE=64
+CFLAGS		= -Wall -D BUFFER_SIZE=64 
 LIBS		= -lm
 
 SRC			= main.c \
@@ -14,6 +14,7 @@ SRC			= main.c \
 			  get_next_line.c \
 			  get_next_line_utils.c \
 			  logic_engine.c \
+			  read_csv_utils.c \
 			  
 OBJ			= $(SRC:.c=.o)
 

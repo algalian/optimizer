@@ -1,14 +1,23 @@
 #include "optimizer.h"
 
 
+unsigned int n_channels;
+
+
 int main(int argc, char **argv)
 {
-    t_channel *t;
+    t_channel t;
 
 
-  
-    t = read_csv(argv[1]);
+    if(argc <= 7)
+    {
+        n_channels = 5;
+    }
+    if(argc > 7)
+    {
+        n_channels = argc;
+    }
+    read_csv(argv[1], &t);
     logic_engine();
-    free(t);
     return(0);
 }
