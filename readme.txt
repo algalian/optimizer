@@ -3,7 +3,8 @@ Dev notes:
 After populating the name field (or any other one), we need a way to get back to the beginning of the file.
 While populating the A field, If no more num values are there, return nicely. If some cells are non numerical, exit hard. Use number of channels as auxiliar variable.
 Do not recreate and remalloc in the second or subsequent pass (the first being the one with the names of the parameters). The list is already created, you just have to populate it with the parameters. Add some witness to check if the list is in its first run or posterior ones.
-Some regex must be implemented to remove the literal commas from the csv
+TO DO : Scratch that: there must be a way to parse the fields that is resilient to commas been in them.
+
 
 User notes:
 

@@ -303,7 +303,163 @@ static void populate_channels(t_channel *head, int fd, int pos, char *needle)
 	//exit(0);
 }
 
-void read_csv(char *filename, t_channel **t)
+
+
+
+static void get_universe(char *filename, t_globals *g)
+{
+	int fd;
+	int i;
+	char *line;
+	char *needle;
+	int j;
+	int len;
+	char *s;
+	double tmp;
+	char *endptr;
+
+	fd = open(filename, O_RDONLY);
+	if(fd < 0)
+	{
+		fprintf(stderr, "Error: cannot open file '%s'\n", filename);
+		exit(1);
+	}
+	i = 0;
+	while(1)
+	{
+		if(line == NULL)
+		{
+			printf("warning. Universe variables not found\n");
+			exit(1);
+		}
+		line = get_next_line(fd);
+		needle = strstr(line, ",Universo");
+		if(needle) //TO DO, Refactor and make it resilient to both commas and !commas)
+		{
+			needle++;
+			while(needle[0] != ',')
+				needle++;
+			len = 0;
+			needle += 2;
+			j = 0;
+			while(needle[j] != '"')
+			{
+				if(needle[j] != ',')
+				{
+					len++;
+				}
+				j++;
+			}
+			s = malloc(sizeof(char) * (len+1));
+			j = 0;
+			len = 0;
+			while(needle[j] != '"')
+			{
+				if(needle[j] !=  ',')
+				{
+					s[len] = needle[j];
+					len++;
+				}
+				j++;
+			}
+			s[len] = '\0';
+			tmp = strtod(s, &endptr);
+			if(*endptr != '\0' || endptr == s)
+			{
+				printf("Error in param universe. %s is not a number\n", s);
+				exit(1);
+			}	
+			g->universe = tmp;
+			free(s);
+			free(line);
+			return;
+		}
+		i++;
+
+	}
+}
+
+static void load_globals(int pos, int fd, t_globals *g)
+{
+	int i;
+	char *line;
+	int len;
+	char *s;
+	char *endptr;
+	float tmp;
+
+	i = 0;
+	line = get_next_line(fd);
+	//printf("we are here now: %s\n", line);
+	//exit(0);
+	i = move_to_pos(line, pos);
+	len = field_len(i, line);
+	s = retrieve(line, i, len);
+	tmp =(float) strtof(s, &endptr);
+	if(*endptr != '\0' || endptr == s)
+	{
+		printf("Error in param alpha. %s is not a number\n", s);
+		exit(1);
+	}
+	g->alpha = tmp;
+	free(s);
+	line = get_next_line(fd);
+	//printf("we are here now: %s\n", line);
+	//exit(0);
+	i = 0;
+	i = move_to_pos(line, pos);
+	len = field_len(i, line);
+	s = retrieve(line, i, len);
+	tmp = (float) strtod(s, &endptr);
+	if(*endptr != '\0' || endptr == s)
+	{
+		printf("Error in param beta. %s is not a number\n", s);
+		exit(1);
+	}
+	g->beta = tmp;
+	free(s);
+	free(line);
+}
+
+
+void get_globals(char *filename, int old_fd, t_globals *g)
+{
+	int fd;
+	int i;
+	char *line;
+	char *needle;
+	int pos;
+
+	close(old_fd);
+	fd = open(filename, O_RDONLY);
+	if(fd < 0)
+	{
+		fprintf(stderr, "Error: cannot open file '%s'\n", filename);
+		exit(1);
+	}
+	i = 0;
+	while(1)
+	{
+		if(line == NULL)
+		{
+			printf("warning. Global variables not found\n");
+			exit(1);
+		}
+		line = get_next_line(fd);
+		needle = strstr(line, ",Corr Dupl,");
+		if(needle)
+		{
+			pos = locate_pos(needle, line);
+			load_globals(pos, fd, g);
+			close(fd);
+			free(line);
+			return;
+		}
+		i++;
+	}
+}
+
+void read_csv(char *filename, t_channel **t, t_globals *g)
 {
 	int fd;
 	int i;
@@ -339,10 +495,15 @@ void read_csv(char *filename, t_channel **t)
 			//printf("%i\n", pos);
 			//exit(0);
 			populate_channels(*t, fd, pos, needle);
+			if(line)
+				free(line);
 			break;
 		}
 		free(line);
 		i++;
 	}
-
+	get_globals(filename,fd, g);
+	//printf("%f %f\n", g->alpha, g->beta);
+	//exit(0);
+	get_universe(filename, g);
 }

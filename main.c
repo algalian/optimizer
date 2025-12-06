@@ -1,30 +1,26 @@
 #include "optimizer.h"
 
 
-unsigned int n_channels;
 
 
 int main(int argc, char **argv)
 {
     t_channel *t;
     t_channel *tmp;
+    t_globals g;
 
-    if(argc <= 7)
-    {
-        n_channels = 5;
-    }
-    if(argc > 7)
-    {
-        n_channels = argc;
-    }
+
     t = NULL;
-    read_csv(argv[1], &t);
+    read_csv(argv[1], &t, &g);
+    printf("File succesfully read and loaded. Displaying parameters...\n");
     tmp = t;
     while (tmp) 
     {
         printf("Channel: %s, a = %f, b = %f, c = %f, cpm = %f, n = %i\n", tmp->name, tmp->a, tmp->b, tmp->c, tmp->cpm, tmp->n);
         tmp = tmp->next;
     }
-    logic_engine();
+    printf("with globals alpha=%f, beta=%f universe=%f\n",g.alpha, g.beta, g.universe);
+    //printf("proceeding to calculate. Please wait...\n");
+    logic_engine(&);
     return(0);
 }

@@ -22,6 +22,7 @@
 # endif
 
 
+
 typedef struct channel
 {   
     char *name;
@@ -29,14 +30,18 @@ typedef struct channel
     double b;
     double c;
     double cpm;
-    double universe;
     int n;
     struct channel *next;
 } t_channel;
 
+typedef struct globals
+{
+    double alpha;
+    double beta;
+    double universe;
+} t_globals;
 
-
-void read_csv(char *filename, t_channel **t);
+void read_csv(char *filename, t_channel **t, t_globals *g);
 void logic_engine();
 char	*get_next_line(int fd);
 char	*ft_strjoin(char *s1, char *s2);
