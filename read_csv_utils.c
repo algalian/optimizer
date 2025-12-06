@@ -43,27 +43,3 @@ void display_channels(t_channel *t) //DEBUGGING ONLY
     }
 }
 
-int locate_pos(char *needle, char *line)
-{
-    int commas;
-    int len;
-    int i;
-
-    len = 0;
-    while(needle[len + 1] != ',')
-    {   
-        len++;
-    }
-    needle[len + 1]= '\0';
-    commas = 0;
-    len = strlen(needle);
-    i = 0;
-    while(strncmp(needle, line, len) != 0)
-    {
-        if(line[0] == ',')
-            commas++;
-        line++;
-        i++;
-    }
-    return(commas);
-}

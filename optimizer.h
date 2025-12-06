@@ -12,7 +12,7 @@
 # include <string.h>
 # include <ctype.h>
 # include <stdbool.h>
-
+# include "libft/libft.h"
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 64
@@ -30,6 +30,7 @@ typedef struct channel
     double c;
     double cpm;
     double universe;
+    int n;
     struct channel *next;
 } t_channel;
 

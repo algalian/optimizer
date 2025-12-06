@@ -3,6 +3,7 @@ Dev notes:
 After populating the name field (or any other one), we need a way to get back to the beginning of the file.
 While populating the A field, If no more num values are there, return nicely. If some cells are non numerical, exit hard. Use number of channels as auxiliar variable.
 Do not recreate and remalloc in the second or subsequent pass (the first being the one with the names of the parameters). The list is already created, you just have to populate it with the parameters. Add some witness to check if the list is in its first run or posterior ones.
+Some regex must be implemented to remove the literal commas from the csv
 
 User notes:
 
@@ -15,4 +16,4 @@ Download the file as a CSV in the sheet where the parameters are.
 THe cells containing the parameter names must only contain the name and nothing else.
 If another cell somewhere in the sheet has also a parameter name in it (for instance, two cells with the word "Universo" in them), the program will ingest by default the one located upper in the document.
 You can move around the columns where the parameters's values are, but their relative position with their names must remain equal (just to be safe, keep it all tight in a single table as originally portraited)
-Do not add non empty cells below the Channel rows.
+Do not add non empty cells below the Channel rows in the Channel column.

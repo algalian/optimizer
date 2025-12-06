@@ -13,20 +13,6 @@
 #include"libft.h"
 
 
-static char	*ft_strcpy(char *dest, const char *src)
-{
-	size_t	i;
-
-	i = 0;
-	while (src[i] != '\0')
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
-}
-
 char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*str;
@@ -51,11 +37,3 @@ char	*ft_strjoin(char *s1, char *s2)
 	free(s1);
 	return (str);
 }
-
-/*int main()
-{
-	char string1[] = "Naciste, idiota, ";
-	char const string2[] = "en una tarde de viento";
-	printf("%s", ft_strjoin(string1, string2));
-	return(0);
-}*/

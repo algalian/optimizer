@@ -2,329 +2,9 @@
 
 
 
-/*
 
 
 
-static void populate_name(t_channel *t, char *line, int field_len, int i)
-{
-	int j;
-	t_channel *aux;
-
-	aux = t;
-	aux->name = malloc(sizeof(char) * (field_len+1));
-	if(!aux->name)
-	{
-		perror("malloc error populating channel struct (name)\n");
-		exit(1);
-	}
-		
-	j = 0;
-	while(j < field_len)
-	{
-		aux->name[j] = line[i];
-		i++;
-		j++;
-	}
-	aux->name[j] = '\0';
-}
-
-static void populate_a(t_channel *t, char *line, int field_len, int i)
-{
-	int j;
-	char *s;
-	char *endptr;
-	double temp;
-	
-	s = malloc(sizeof(char) * (field_len + 1));
-	if(!s)
-	{
-		perror("malloc error populating channel struct (A)\n");
-		exit(1);
-	}        
-	j = 0;
-	while(j < field_len)
-	{
-		s[j] = line[i];
-		i++;
-		j++;
-	}
-	s[j] = '\0';   
-	temp = strtod(s, &endptr);
-	//printf("%s\n", s);
-	if(*endptr != '\0' || endptr == line)
-	{
-		printf("%s is not a number. Discarded\n",s);
-		free(s);
-		return;
-	}
-	t->a = temp;
-	printf("%f\n", t->a);
-	free(s);
-}
-
-static void populate_channel(t_channel *t, int pos, char *line, int fd, char *field_name)
-{
-	int i;
-	int commas;
-	int k;
-	int field_len;
-	char *s;
-	char *endptr;
-	int j;
-	double temp;
-	int iter;
-
-	commas = 0;
-	iter = 0;
-	while(t)
-	{
-		line = get_next_line(fd);
-		i = 0;
-		commas = 0;
-		while(commas <= pos)
-		{
-			if(line[i] == ',')
-			{
-				commas++;
-			}
-			i++;
-			//printf("%i: %c\n", i, line[i]);
-		}
-		field_len = 0;
-		k = i;
-		while(line[k] != ',' && line[k])
-		{   
-			field_len++;
-			k++;
-		}
-		s = malloc(sizeof(char) * (field_len + 1));
-		j = 0;
-		while(j < field_len)
-		{
-			s[j] = line[i];
-			j++;
-			i++;
-		}
-		s[j] = '\0';
-		temp = strtod(s, &endptr);
-		if(*endptr != '\0' || endptr == line)
-		{
-			printf("%s is not a number. Discarded\n",s);
-			free(s);
-			return;
-		}
-		if(strcmp(field_name, "a") == 0)
-			t->a = temp;
-		if(strcmp(field_name, "b") == 0)
-			t->b = temp;
-		if(strcmp(field_name, "c") == 0)
-			t->c = temp;
-		if(strcmp(field_name, "cpm") == 0)
-			t->cpm = temp;
-		if(strcmp(field_name, "universo") == 0)
-			t->universe = temp;
-		t = t->next;
-		free(line);
-		iter++;
-	}
-}
-
-
-void retrieve_field(int pos, t_channel *t, int fd, char *field)
-{
-	int i;
-	int k;
-	int iter;
-	char *line;
-	int commas;
-	int field_len;
-	//t_channel *aux;
-	//static int init_struct;
-
-	//aux = t;
-	//display_channels(t);
-	iter = 0;
-	//printf("%i\n", init_struct);
-	while(1)
-	{
-		line = get_next_line(fd);
-		i = 0;
-		commas = 0;
-		while(commas <= pos)
-		{
-			if(line[i] == ',')
-			{
-				commas++;
-			}
-			i++;
-			//printf("%i: %c\n", i, line[i]);
-		}
-		if(line[i] == ',')
-		{
-			free(line);
-			//printf("the loop was broken at %i i'm out\n", iter);
-			break;        
-		}
-		field_len = 0;
-		k = i;
-		while(line[k] != ',' && line[k])
-		{   
-			field_len++;
-			k++;
-		}
-		//printf("len : %i, char %c\n", field_len, line[i]);
-		if(strcmp(field, "name") == 0)
-		{    
-			populate_name(t, line, field_len, i);
-		}
-		t->next = malloc(sizeof(t_channel));
-		if(!t->next)
-		{
-			perror("malloc error generating channel struct");
-			exit(1);
-		}
-		memset(t->next, 0, sizeof(t_channel));
-		//printf("%s\n", aux->name);
-		//exit(0);
-		t = t->next;
-		t->next = NULL;
-		free(line);
-		iter++;
-	}
-	//display_channels(t);
-}
-
-
-void read_csv(char *filename, t_channel *t) 
-{
-	int fd;
-	int i;
-	char *line;
-	char *needle;
-	int pos;
-	bool names;
-	bool a;
-	bool header;
-	//bool b;
-	//bool c;
-	//bool cpm;
-	//bool universe;
-
-	fd = open(filename, O_RDONLY);
-	if(fd < 0)
-	{
-		fprintf(stderr, "Error: cannot open file '%s'\n", filename);
-		exit(1);
-	}
-	i = 0;
-	names = false;
-	a = false;
-	header = false;
-	t = malloc(sizeof(t_channel));
-	if(!t)
-	{
-		perror("malloc error generating channel struct\n");
-		exit(1);
-	}
-	while(1 && i < 20)
-	{
-		
-		if (line == NULL || (names && a))
-		{
-			break;
-		}
-		if(header == false)
-		{ 
-			line = get_next_line(fd);
-		}
-		if(header == true)
-		{    
-			close(fd);
-			fd = open(filename, O_RDONLY);
-			if(fd < 0)
-			{
-				fprintf(stderr, "Error: cannot open file '%s'\n", filename);
-				exit(1);
-			}
-			i = 0;
-			header = false;
-			line = get_next_line(fd);
-		}
-
-		if(!names) 
-		{
-
-			needle = strstr(line,",Channel,");
-			if(needle)
-			{
-				pos = locate_pos(needle, line);
-				retrieve_field(pos, t, fd, "name");
-				names = true;
-				close(fd);
-				fd = open(filename, O_RDONLY);
-				if(fd < 0)
-				{
-					fprintf(stderr, "Error: cannot open file '%s'\n", filename);
-					exit(1);
-				}
-				i = 0;
-				printf("displaying channels inside name retrieval...\n");
-				display_channels(t);
-				header = true;
-				line = get_next_line(fd);
-				printf("%s\n", line);
-			}
-		}
-		if(!a)
-		{
-			//printf("entering in A check at %i\n", i);
-			needle = strstr(line, ",A,");
-			if(needle)
-			{
-				//printf("a field found at %i\n",i);
-				pos = locate_pos(needle, line);
-				populate_channel(t, pos, line, fd, "a");
-				a = true;
-				close(fd);
-				fd = open(filename, O_RDONLY);
-				if(fd < 0)
-				{
-					fprintf(stderr, "Error: cannot open file '%s'\n", filename);
-					exit(1);
-				}
-				i = 0;
-				printf("displaying channels inside A retrieval...\n");
-				display_channels(t);
-				header = true;
-				line = get_next_line(fd);
-			}
-		}
-		//printf("%i) %i, %i, %i\n%s\n", i, a, names, header, line);
-		free(line);
-		i++;
-	}
-	close(fd);
-}*/
-
-int move_to_pos(char *line, int pos)
-{
-	int i;
-	int commas;
-
-	i = 0;
-	commas = 0;
-	while(commas <= pos)
-	{
-		if(line[i] == ',')
-		{
-			commas++;
-		}
-		i++;
-		//printf("%i: %c\n", i, line[i]);
-	}
-	return(i);
-}
 
 t_channel *add_channel(t_channel **head)
 {
@@ -352,6 +32,29 @@ t_channel *add_channel(t_channel **head)
     return (new_node);
 }
 
+int move_to_pos(char *line, int pos)
+{
+	int i;
+	int commas;
+
+	i = 0;
+	commas = 0;
+	//printf("the line is %s\n the pos is %i", line, pos);
+	//exit(0);
+	while(commas < pos)
+	{
+		if(line[i] == ',')
+		{
+			commas++;
+		}
+		i++;
+		//printf("%i: %c\n", i, line[i]);
+	}
+	//printf("%s\n", &line[i]);
+	//exit(0);
+	return(i);
+}
+
 void build_channels(t_channel **t, int fd, int pos)
 {
 	char *line;
@@ -369,6 +72,235 @@ void build_channels(t_channel **t, int fd, int pos)
 		}
 		add_channel(t);
 	}
+	close(fd);
+}
+
+int field_len(int i, char *line)
+{
+	int len;
+	int j;
+
+	len = 0;
+	j = i;
+	while(line[j] && line[j] != ',')
+	{
+		if(line[j] == '"')
+		{
+			j++;
+			len++;
+			while(line[j] != '"')
+			{
+				j++;
+				len++;
+			}
+		}
+		j++;
+		len++;
+
+	}
+	return(len);
+}
+
+static void liberate(char **s)
+{
+	int i;
+
+	i = 0;
+	while(s[i])
+	{
+		if(s[i])
+			free(s[i]);
+		i++;
+	}
+	free(s);
+}
+
+
+
+
+
+int locate_pos(char *needle, char *line)
+{
+	int commas;
+	char *s;
+	char *dup_line;
+	int len;
+	int i;
+
+	s = ft_strdup(needle);
+	s++;
+	dup_line = ft_strdup(line);
+	len = strlen(s);
+	commas = 0;
+	i = 0;
+	while(ft_strncmp(s, dup_line, len) != 0)
+	{
+		if(dup_line[0] == ',')
+			commas++;
+		dup_line++;
+		i++;
+	}
+	dup_line -= i;
+	free(dup_line);
+	s--;
+	free(s);
+	return(commas);
+}
+
+static int backtrack(int i, char *filename, int fd)
+{
+	int new_fd;
+	int j;
+	char *line;
+
+	close(fd);
+	new_fd = open(filename, O_RDONLY);
+	if(new_fd < 0)
+	{
+		fprintf(stderr, "Error: cannot open file '%s'\n", filename);
+		exit(1);
+	}
+	j = 0;
+	while(j < i)
+	{
+		line = get_next_line(new_fd);
+		free(line);
+		j++;
+	}
+	return(new_fd);
+}
+
+char *retrieve(char *line, int i, int len)
+{
+	int j;
+	int k;
+	char *s;
+
+	j = i;
+	s = malloc(sizeof(char) * (len + 1));
+	k = 0;
+	while(line[j] != ',' && line[j])
+	{
+		s[k] = line[j];
+		k++;
+		j++;
+	}
+	s[k] ='\0';
+	return(s);
+}
+
+
+static void check_and_assign(double p, char *param, t_channel *t, char *s, char *endptr)
+{
+	if(strcmp(param,"A") == 0)
+	{
+		if(*endptr != '\0' || endptr == s)
+		{
+			printf("Error in param %s. %s is not a number\n", param, s);
+			exit(1);
+		}
+		t->a = p;
+	}
+	if(strcmp(param, "B") == 0)
+	{
+		if(*endptr != '\0' || endptr == s)
+		{
+			printf("Error in param %s. %s is not a number\n", param, s);
+			exit(1);
+		}
+		t->b = p;
+	}
+	if(strcmp(param, "C") == 0)
+	{
+		if(*endptr != '\0' || endptr == s)
+		{
+			printf("Error in param %s. %s is not a number\n", param, s);
+			exit(1);
+		}
+		t->c = p;
+	}
+	if(strcmp(param, "CPM Compra") == 0)
+	{
+		if(*endptr != '\0' || endptr == s)
+		{
+			printf("Error in param %s. %s is not a number\n", param, s);
+			exit(1);
+		}
+		t->cpm = p;
+	}
+	if(strcmp(param, "Channel") == 0)
+	{	
+		t->name = ft_strdup(s);
+	}
+	if(strcmp(param, "Nº") == 0)
+		t->n = (int) p;
+}
+
+static void populate_channels(t_channel *head, int fd, int pos, char *needle)
+{
+	int i;
+	char *line;
+	int len;
+	double tmp;
+	char *endptr;
+	char *s;
+	char **header; //check for the header row and add to the corresponding field.
+	int k;
+	int scan;
+
+	header = ft_split(needle, ',');
+	i = 0;
+	/*while(header[i])
+	{
+		printf("%s\n", header[i]);
+		i++;
+	}
+	exit(0);*/
+	scan = 0;
+	while (head != NULL) 
+	{
+		i = 0;
+		line = get_next_line(fd);
+		i = move_to_pos(line, pos);
+		k = 0;
+		//printf("%s, %i\n", &line[i], i);
+		//exit(0);
+		while(header[k])	
+		{
+			len = field_len(i,line);
+			if(strcmp(header[k], "A") == 0 
+			|| strcmp(header[k], "B") == 0 
+			|| strcmp(header[k],"C") == 0 
+			|| strcmp(header[k], "CPM Compra") == 0 
+			|| strcmp(header[k],"Channel") == 0 
+			|| strcmp(header[k], "Nº") == 0)
+			{
+				s = retrieve(line, i, len);
+				//printf("%s\n", s);
+				//exit(0);
+				tmp = strtod(s, &endptr);
+				//printf("%f\n", tmp);
+				//exit(0);
+				check_and_assign(tmp,header[k], head, s, endptr);
+				free(s);
+			}
+			//printf("%s\n%s\n", header[k],&line[i]);
+			i += len;
+			i++;
+			k++;
+		}
+		/*printf("%s\n", head->name);
+		printf("%f\n", head->a);
+		printf("%f\n", head->b);
+		printf("%f\n", head->c);
+		printf("%f\n", head->cpm);
+		//printf("%s\n", head->universe);
+		printf("%i\n", head->n);*/
+		head = head->next;
+		scan++;
+    }
+	liberate(header);
+	//exit(0);
 }
 
 void read_csv(char *filename, t_channel **t)
@@ -389,17 +321,27 @@ void read_csv(char *filename, t_channel **t)
 	i = 0;
 	while(1)
 	{
-		if(line == NULL) //TO DO: exit conditions
+		if(line == NULL) 
 		{
-			break;
+			printf("Warning. Parameters not found\n");
+			exit(1);
 		}
 		line = get_next_line(fd);
-		needle = strstr(line,",A,B,C,Nº,Channel,");
+		needle = strstr(line,",A,B,C,Nº,Channel,Inversión,% Inv,CPM Compra,"); // or any other admissible combinations of them
 		if(needle)
 		{
 			pos = locate_pos(",Channel,",line);
 			build_channels(t, fd, pos);
+			fd = backtrack(i, filename, fd);
+			line = get_next_line(fd);
+			//printf("we are now on %s\n", line);
+			pos = locate_pos(needle, line);
+			//printf("%i\n", pos);
+			//exit(0);
+			populate_channels(*t, fd, pos, needle);
+			break;
 		}
+		free(line);
 		i++;
 	}
 
