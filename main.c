@@ -21,6 +21,6 @@ int main(int argc, char **argv)
     }
     printf("with globals alpha=%f, beta=%f universe=%f\n",g.alpha, g.beta, g.universe);
     //printf("proceeding to calculate. Please wait...\n");
-    logic_engine(&);
+    logic_engine(&t, &g);
     return(0);
 }
