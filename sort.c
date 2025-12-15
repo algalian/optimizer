@@ -7,7 +7,7 @@ t_channel* sorted_merge(t_channel* a, t_channel* b)
     if (!a) return b;
     if (!b) return a;
 
-    if (a->cob <= b->cob)
+    if (a->cob >= b->cob)
     {
         result = a;
         result->next = sorted_merge(a->next, b);

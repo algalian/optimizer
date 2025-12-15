@@ -6,7 +6,7 @@ EXTRACT;
 -Check for leaks
 -Pass onto the logic engine the number of channels
 TRANSFORM;
-
+-Check the values obtained by the cob funcs and aggregated funcs.
 LOAD;
 
 
