@@ -28,8 +28,6 @@ int main(int argc, char **argv)
     //display_channels(t, &g);
     //printf("proceeding to calculate. Please wait...\n");
     logic_engine(&t, &g);
-    if (stop_requested)
-        printf("\nInterrupted! Checked %llu combinations.\n", (unsigned long long)checked);
     free_channels(t);
     return(0);
 }

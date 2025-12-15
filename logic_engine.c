@@ -55,7 +55,65 @@ static int count_channels(t_channel *t)
 	}
 	return(i);
 }
+t_channel *copy_list(const t_channel *src) 
+{
+    t_channel *head;
+    t_channel *tail;
+    t_channel *n;
 
+	head = NULL;
+	tail = NULL;
+    while (src != NULL) 
+	{
+    	n = malloc(sizeof(t_channel));
+        if (!n) 
+		{
+            free_channels(head);
+			perror("malloc error in logic engine\n");
+			exit(1);
+		}
+        n->a = src->a;
+		n->b = src->b;
+		n->c = src->c;
+		n->cpm = src->cpm;
+		n->cob = src->cob;
+		n->inv = src->inv;
+		n->n = src->n;
+		n->name = src->name;
+        n->next = NULL;
+        if (!head) 
+		{
+            head = n;
+            tail = n;
+        } 
+		else 
+		{
+            tail->next = n;
+            tail = n;
+        }
+
+        src = src->next;
+    }
+
+    return(head);
+}
+
+void update_list(t_channel *dst, const t_channel*src) 
+{
+    while (dst != NULL && src != NULL) 
+	{
+        dst->a = src->a;
+		dst->b = src->b;
+		dst->c = src->c;
+		dst->cpm = src->cpm;
+		dst->cob = src->cob;
+		dst->inv = src->inv;
+		dst->n = src->n;
+		dst->name = src->name;
+        dst = dst->next;
+        src = src->next;
+    }
+}
 
 void logic_engine(t_channel **t, t_globals *g)
 {
@@ -70,7 +128,6 @@ void logic_engine(t_channel **t, t_globals *g)
 	int n_channels;
 	int i;
 	int j;
-	int k;
 	int sum;
 	time_t last_report = 0;
 	unsigned long long checked;
@@ -80,6 +137,12 @@ void logic_engine(t_channel **t, t_globals *g)
 	total = 1000000; // this might be flexible, dynamic or user-defined?
 	acc = 1000;
 	inv = malloc(sizeof(int) * n_channels);
+	opt = NULL;
+	if(!inv)
+	{
+		perror("malloc error in logic engine\n");
+		exit(1);
+	}
 	i = 1;
 	inv[0] = total;
 	while(i < n_channels)
@@ -117,6 +180,21 @@ void logic_engine(t_channel **t, t_globals *g)
 		if(ag_cob >= max)
 		{	
 			max = ag_cob;
+			if(opt == NULL)
+			{
+				opt = copy_list(*t);
+				if(!opt)
+				{
+					perror("malloc error in logic engine\n");
+					exit(1);
+				}
+
+			}
+			else
+			{
+				update_list(opt, *t);
+			}
+
 		}
 		//display_channels(*t, g);
 		//printf("%f\n", ag_cob);
@@ -147,8 +225,8 @@ void logic_engine(t_channel **t, t_globals *g)
 		}
 		checked++;		
 	}
-	printf("done. Cob = %f\n", max);
-	k = 0;
+	printf("found it!!!  coberture = %f\n", max);
+	display_channels(opt, NULL);
 	free(inv);
-	free(opt);
+	free_channels(*t);
 }
