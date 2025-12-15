@@ -15,31 +15,32 @@ bool is_line_empty(char *s)
 }
 
 
-void display_channels(t_channel *t) //DEBUGGING ONLY
+void display_channels(const t_channel *head, const t_globals *g)
 {
-    t_channel *aux;
-    int i;
+    printf("Globals:\n");
+    printf("  alpha    : %.3f\n", g->alpha);
+    printf("  beta     : %.3f\n", g->beta);
+    printf("  universe : %.3f\n", g->universe);
 
-    aux = t;
-    
-    i = 0;
-    while(aux)
-    {
+    printf("\nChannels:\n");
 
-        printf("%s\n", aux->name);
-        printf("a:%f\n", aux->a);
-        /*if(aux->b)
-            printf("b:%s\n", aux->b);
-        if(aux->c)
-            printf("c:%s\n", aux->c);
-        if(aux->cpm)
-            printf("cpm:%s\n", aux->cpm);
-        if(aux->universe)
-            printf("universe:%s\n", aux->universe);*/
-        aux = aux->next;
-        //printf("it passes %i succesfully\n", i);
-        i++;
-        
+    const t_channel *tmp = head;
+    int index = 0;
+
+    while (tmp) {
+        printf(" Channel %s, a = %f, b = %f, c = %f, cpm = %f, Nº = %i, coberture = %f\n",
+               tmp->name,
+               tmp->a,
+               tmp->b,
+               tmp->c,
+               tmp->cpm,
+               tmp->n,
+               tmp->cob);
+
+        tmp = tmp->next;
+        index++;
     }
-}
 
+    if (index == 0)
+        printf("  (no channels)\n");
+}

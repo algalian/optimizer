@@ -12,7 +12,9 @@ SRC         = main.c \
               read_csv.c \
 			  read_csv_utils.c \
               get_next_line.c \
-              logic_engine.c
+              logic_engine.c \
+			  sort.c \
+			
 
 OBJ         = $(SRC:.c=.o)
 

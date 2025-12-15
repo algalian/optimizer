@@ -31,6 +31,7 @@ typedef struct channel
     double c;
     double cpm;
     int n;
+    double cob;
     struct channel *next;
 } t_channel;
 
@@ -42,14 +43,15 @@ typedef struct globals
 } t_globals;
 
 void read_csv(char *filename, t_channel **t, t_globals *g);
-void logic_engine();
+void logic_engine(t_channel **t, t_globals *g);
 char	*get_next_line(int fd);
 char	*ft_strjoin(char *s1, char *s2);
 char	*ft_strchr(const char *s, int c);
 size_t	ft_strlen(const char *str);
 int locate_pos(char *needle, char *line);
-void display_channels(t_channel *t);
+void display_channels(const t_channel *head, const t_globals *g);
 bool is_line_empty(char *s);
+void merge_sort(t_channel **head_ref);
 
 
 #endif
