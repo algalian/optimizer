@@ -217,8 +217,8 @@ void logic_engine(t_channel **t, t_globals *g)
 		if (i + 1 < n_channels)
 			inv[i+1] = sum + acc;
 		time_t now = time(NULL);
-        if (now - last_report >= 1) 
-		{   // once per second
+        if (now - last_report >= 5) 
+		{   
             printf("%llu combinations checked. Current: %i, %i, %i, %i\n", checked, inv[0], inv[1], inv[2], inv[3]);
 			fflush(stdout);
             last_report = now;
@@ -228,5 +228,4 @@ void logic_engine(t_channel **t, t_globals *g)
 	printf("found it!!!  coberture = %f\n", max);
 	display_channels(opt, NULL);
 	free(inv);
-	free_channels(*t);
 }
