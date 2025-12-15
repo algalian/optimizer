@@ -12,7 +12,11 @@
 # include <string.h>
 # include <ctype.h>
 # include <stdbool.h>
+# include <signal.h>
+# include <stdint.h>
+# include <time.h>
 # include "libft/libft.h"
+#include <inttypes.h>
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 64
@@ -32,6 +36,7 @@ typedef struct channel
     double cpm;
     int n;
     double cob;
+    int inv;
     struct channel *next;
 } t_channel;
 
@@ -41,6 +46,8 @@ typedef struct globals
     double beta;
     double universe;
 } t_globals;
+
+
 
 void read_csv(char *filename, t_channel **t, t_globals *g);
 void logic_engine(t_channel **t, t_globals *g);

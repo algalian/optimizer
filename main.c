@@ -1,12 +1,24 @@
 #include "optimizer.h"
 
 
+void free_channels(t_channel *head)
+{
+    t_channel *tmp;
+
+    while (head)
+    {
+        tmp = head->next;   
+        free(head);         
+        head = tmp;         
+    }
+}
+
 
 
 int main(int argc, char **argv)
 {
     t_channel *t;
-    t_channel *tmp;
+    //t_channel *tmp;
     t_globals g;
 
 
@@ -16,5 +28,8 @@ int main(int argc, char **argv)
     //display_channels(t, &g);
     //printf("proceeding to calculate. Please wait...\n");
     logic_engine(&t, &g);
+    if (stop_requested)
+        printf("\nInterrupted! Checked %llu combinations.\n", (unsigned long long)checked);
+    free_channels(t);
     return(0);
 }
