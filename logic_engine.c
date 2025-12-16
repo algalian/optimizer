@@ -8,8 +8,9 @@ static void compute_cob(t_channel *t, t_globals *g, int inv)
 	double x;
 
 	x = inv/(t->cpm*(g->universe/100));
-	cob = t->a/(1 + pow(x, -(t->c))); // TO DO: use a more performative power func
-	t->cob = 1 - cob;
+    x = x*0.001;
+	cob = t->a/(1 + (t->b*pow(x, (t->c)))); // TO DO: use a more performative power func
+	t->cob = cob;
 	t->inv = inv;
 }
 
@@ -26,7 +27,7 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 	i = 0;   
 	while(snd)
 	{
-		ag_cob = pow(snd->cob, pow(g->beta,i));
+		ag_cob = pow((1-snd->cob), pow(g->beta,i));
 		i++;
 		snd = snd->next;
 	}
@@ -172,12 +173,13 @@ void logic_engine(t_channel **t, t_globals *g)
 			i++;
 		}
 		//display_channels(*t, g);
-		merge_sort(t);
+		merge_sort(t, "cob");
 		//display_channels(*t, g);
 		snd_ag_cob = second_tier_aggregated_cob(*t, g);
 		//printf("snd tier ag cob: %f\n",snd_ag_cob);
 		ag_cob = aggregated_cob(*t,g,snd_ag_cob);
-		if(ag_cob >= max)
+		merge_sort(t, "n");
+        if(ag_cob >= max)
 		{	
 			max = ag_cob;
 			if(opt == NULL)
@@ -217,15 +219,16 @@ void logic_engine(t_channel **t, t_globals *g)
 		if (i + 1 < n_channels)
 			inv[i+1] = sum + acc;
 		time_t now = time(NULL);
-        if (now - last_report >= 5) 
-		{   
+        if (now - last_report >= 1) 
+		{
             printf("%llu combinations checked. Current: %i, %i, %i, %i\n", checked, inv[0], inv[1], inv[2], inv[3]);
 			fflush(stdout);
             last_report = now;
-		}
-		checked++;		
+        }
+		checked++;
 	}
+    merge_sort(t, "n");
 	printf("found it!!!  coberture = %f\n", max);
-	display_channels(opt, NULL);
+	display_channels(opt, g);
 	free(inv);
 }

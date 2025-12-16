@@ -58,7 +58,7 @@ size_t	ft_strlen(const char *str);
 int locate_pos(char *needle, char *line);
 void display_channels(const t_channel *head, const t_globals *g);
 bool is_line_empty(char *s);
-void merge_sort(t_channel **head_ref);
+void merge_sort(t_channel **head_ref, char *field);
 void free_channels(t_channel *head);
 
 #endif

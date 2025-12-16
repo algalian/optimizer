@@ -1,23 +1,37 @@
 #include"optimizer.h"
 
-t_channel* sorted_merge(t_channel* a, t_channel* b)
+t_channel* sorted_merge(t_channel* a, t_channel* b, char *field)
 {
     t_channel* result = NULL;
 
     if (!a) return b;
     if (!b) return a;
-
-    if (a->cob >= b->cob)
+    if(strcmp("cob",field) == 0)
     {
-        result = a;
-        result->next = sorted_merge(a->next, b);
+        if (a->cob >= b->cob)
+        {
+            result = a;
+            result->next = sorted_merge(a->next, b,field);
+        }
+        else
+        {
+            result = b;
+            result->next = sorted_merge(a, b->next,field);
+        }
     }
-    else
+    if(strcmp("n",field)== 0)
     {
-        result = b;
-        result->next = sorted_merge(a, b->next);
+        if (a->n <= b->inv)
+        {
+            result = a;
+            result->next = sorted_merge(a->next, b,field);
+        }
+        else
+        {
+            result = b;
+            result->next = sorted_merge(a, b->next,field);
+        }
     }
-
     return result;
 }
 
@@ -42,7 +56,7 @@ void split_list(t_channel* source, t_channel** front, t_channel** back)
     slow->next = NULL;
 }
 
-void merge_sort(t_channel** head_ref)
+void merge_sort(t_channel** head_ref, char *field)
 {
     t_channel* head = *head_ref;
     t_channel *a, *b;
@@ -52,8 +66,8 @@ void merge_sort(t_channel** head_ref)
 
     split_list(head, &a, &b);
 
-    merge_sort(&a);
-    merge_sort(&b);
+    merge_sort(&a, field);
+    merge_sort(&b,field);
 
-    *head_ref = sorted_merge(a, b);
+    *head_ref = sorted_merge(a, b, field);
 }
