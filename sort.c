@@ -3,9 +3,9 @@
 int cmp_cob_dsc(const t_channel *a, const t_channel *b)
 {
     if(a->cob < b->cob)
-        return(-1);
-    if(a->cob > b->cob)
         return(1);
+    if(a->cob > b->cob)
+        return(-1);
     return(0);
 }
 

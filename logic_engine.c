@@ -31,7 +31,7 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 		i++;
 		snd = snd->next;
 	}
-	return(1 - ag_cob);
+	return(ag_cob);
 }
 
 static double aggregated_cob(t_channel *t, t_globals *g, double snd_ag_cob)
@@ -174,12 +174,12 @@ void logic_engine(t_channel **t, t_globals *g)
 		}
 		//display_channels(*t, g);
 		merge_sort(t, cmp_cob_dsc);
-		//display_channels(*t, g);
+		//display_channels(*t, NULL);
 		snd_ag_cob = second_tier_aggregated_cob(*t, g);
 		//printf("snd tier ag cob: %f\n",snd_ag_cob);
 		ag_cob = aggregated_cob(*t,g,snd_ag_cob);
 		merge_sort(t, cmp_n_asc);
-		display_channels(*t,NULL);
+		//display_channels(*t,NULL);
         if(ag_cob >= max)
 		{	
 			max = ag_cob;
@@ -230,6 +230,6 @@ void logic_engine(t_channel **t, t_globals *g)
 	}
     merge_sort(t, cmp_n_asc);
 	printf("found it!!!  coberture = %f\n", max);
-	display_channels(opt, g);
+	//display_channels(opt, g);
 	free(inv);
 }
