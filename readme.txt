@@ -9,7 +9,7 @@ EXTRACT;
 -Pass onto the logic engine the number of channels
 
 TRANSFORM;
-
+0^-c is not defined. Handle the inv = 0 case separately.
 LOAD;
 
 

@@ -29,14 +29,14 @@ void display_channels(const t_channel *head, const t_globals *g)
 	int index = 0;
 	while (tmp) 
 	{
-		printf(" Channel %s, a = %f, b = %f, c = %f, cpm = %f, Nº = %i, coberture = %f optimal assignment = %i\n",
+		printf(" Channel %s, a = %f, b = %f, c = %f, cpm = %f, Nº = %i, coberture = %f, optimal assignment = %i, not_cob %f\n",
 		tmp->name,
 		tmp->a,
 		tmp->b,
 		tmp->c,
 		tmp->cpm,
 		tmp->n,
-		tmp->cob, tmp->inv);
+		tmp->cob, tmp->inv, tmp->not_cob);
 		tmp = tmp->next;
 		index++;
 	}
