@@ -47,6 +47,7 @@ typedef struct globals
     double universe;
 } t_globals;
 
+typedef int (*t_cmp) (const t_channel *a, const t_channel *b);
 
 
 void read_csv(char *filename, t_channel **t, t_globals *g);
@@ -58,7 +59,9 @@ size_t	ft_strlen(const char *str);
 int locate_pos(char *needle, char *line);
 void display_channels(const t_channel *head, const t_globals *g);
 bool is_line_empty(char *s);
-void merge_sort(t_channel **head_ref, char *field);
+void merge_sort(t_channel **head_ref, t_cmp cmp);
 void free_channels(t_channel *head);
+int cmp_cob_dsc(const t_channel *a, const t_channel *b);
+int cmp_n_asc(const t_channel *a, const t_channel *b);
 
 #endif

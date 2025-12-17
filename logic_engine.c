@@ -161,7 +161,7 @@ void logic_engine(t_channel **t, t_globals *g)
 	i = 0;
 	max = 0;
 	checked = 0;
-	while(1) // what is the exit condition? 
+	while(checked < 5) // what is the exit condition? 
 	{	
 		i = 0;
 		tmp = *t;
@@ -173,12 +173,13 @@ void logic_engine(t_channel **t, t_globals *g)
 			i++;
 		}
 		//display_channels(*t, g);
-		merge_sort(t, "cob");
+		merge_sort(t, cmp_cob_dsc);
 		//display_channels(*t, g);
 		snd_ag_cob = second_tier_aggregated_cob(*t, g);
 		//printf("snd tier ag cob: %f\n",snd_ag_cob);
 		ag_cob = aggregated_cob(*t,g,snd_ag_cob);
-		merge_sort(t, "n");
+		merge_sort(t, cmp_n_asc);
+		display_channels(*t,NULL);
         if(ag_cob >= max)
 		{	
 			max = ag_cob;
@@ -227,7 +228,7 @@ void logic_engine(t_channel **t, t_globals *g)
         }
 		checked++;
 	}
-    merge_sort(t, "n");
+    merge_sort(t, cmp_n_asc);
 	printf("found it!!!  coberture = %f\n", max);
 	display_channels(opt, g);
 	free(inv);

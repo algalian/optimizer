@@ -9,6 +9,7 @@ TRANSFORM;
 -Check the values obtained by the cob funcs and aggregated funcs.
 -Sanity check & edges. What should happen if inv = 0? What makes cob drop to 0?
 -To track which channel gets how much inv, make a copy of the linked list whenever we hit a new max and just leave it there.
+-Sort function abstracted to decide on-call which field is the list sorted by
 LOAD;
 
 

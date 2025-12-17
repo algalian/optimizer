@@ -1,38 +1,35 @@
 #include"optimizer.h"
 
-t_channel* sorted_merge(t_channel* a, t_channel* b, char *field)
+int cmp_cob_dsc(const t_channel *a, const t_channel *b)
 {
-    t_channel* result = NULL;
+    if(a->cob < b->cob)
+        return(-1);
+    if(a->cob > b->cob)
+        return(1);
+    return(0);
+}
+
+int cmp_n_asc(const t_channel *a, const t_channel *b)
+{
+    return (a->n - b->n);
+}
+
+t_channel* sorted_merge(t_channel* a, t_channel* b, t_cmp cmp)
+{
 
     if (!a) return b;
     if (!b) return a;
-    if(strcmp("cob",field) == 0)
+
+    if(cmp(a,b) <= 0)
     {
-        if (a->cob >= b->cob)
-        {
-            result = a;
-            result->next = sorted_merge(a->next, b,field);
-        }
-        else
-        {
-            result = b;
-            result->next = sorted_merge(a, b->next,field);
-        }
+        a->next = sorted_merge(a->next, b, cmp);
+        return a;
     }
-    if(strcmp("n",field)== 0)
+    else
     {
-        if (a->n <= b->inv)
-        {
-            result = a;
-            result->next = sorted_merge(a->next, b,field);
-        }
-        else
-        {
-            result = b;
-            result->next = sorted_merge(a, b->next,field);
-        }
+        b->next = sorted_merge(a, b->next, cmp);
+        return b;
     }
-    return result;
 }
 
 void split_list(t_channel* source, t_channel** front, t_channel** back)
@@ -56,7 +53,7 @@ void split_list(t_channel* source, t_channel** front, t_channel** back)
     slow->next = NULL;
 }
 
-void merge_sort(t_channel** head_ref, char *field)
+void merge_sort(t_channel** head_ref, t_cmp cmp)
 {
     t_channel* head = *head_ref;
     t_channel *a, *b;
@@ -66,8 +63,8 @@ void merge_sort(t_channel** head_ref, char *field)
 
     split_list(head, &a, &b);
 
-    merge_sort(&a, field);
-    merge_sort(&b,field);
+    merge_sort(&a, cmp);
+    merge_sort(&b,cmp);
 
-    *head_ref = sorted_merge(a, b, field);
+    *head_ref = sorted_merge(a, b, cmp);
 }
