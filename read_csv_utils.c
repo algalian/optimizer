@@ -40,7 +40,6 @@ void display_channels(const t_channel *head, const t_globals *g)
 		tmp = tmp->next;
 		index++;
 	}
-
 	if (index == 0)
 		printf("  (no channels)\n");
 }

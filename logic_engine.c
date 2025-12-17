@@ -25,9 +25,10 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 	snd = snd->next;
 	//display_channels(snd, g);
 	i = 0;   
+	ag_cob = 1;
 	while(snd)
 	{
-		ag_cob = pow((1-snd->cob), pow(g->beta,i));
+		ag_cob *= pow((1-snd->cob), pow(g->beta,i));
 		i++;
 		snd = snd->next;
 	}
@@ -136,7 +137,7 @@ void logic_engine(t_channel **t, t_globals *g)
 
 	n_channels = count_channels(*t);
 	total = 1000000; // this might be flexible, dynamic or user-defined?
-	acc = 1000;
+	acc = 10000;
 	inv = malloc(sizeof(int) * n_channels);
 	opt = NULL;
 	if(!inv)
@@ -161,7 +162,7 @@ void logic_engine(t_channel **t, t_globals *g)
 	i = 0;
 	max = 0;
 	checked = 0;
-	while(checked < 5) // what is the exit condition? 
+	while(1) // what is the exit condition? 
 	{	
 		i = 0;
 		tmp = *t;
@@ -228,8 +229,8 @@ void logic_engine(t_channel **t, t_globals *g)
         }
 		checked++;
 	}
-    merge_sort(t, cmp_n_asc);
+    //merge_sort(t, cmp_n_asc);
 	printf("found it!!!  coberture = %f\n", max);
-	//display_channels(opt, g);
+	display_channels(opt, g);
 	free(inv);
 }
