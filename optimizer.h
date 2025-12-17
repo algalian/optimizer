@@ -36,6 +36,7 @@ typedef struct channel
     double cpm;
     int n;
     double cob;
+    double not_cob;
     int inv;
     struct channel *next;
 } t_channel;
@@ -61,7 +62,7 @@ void display_channels(const t_channel *head, const t_globals *g);
 bool is_line_empty(char *s);
 void merge_sort(t_channel **head_ref, t_cmp cmp);
 void free_channels(t_channel *head);
-int cmp_cob_dsc(const t_channel *a, const t_channel *b);
+int cmp_notcob_asc(const t_channel *a, const t_channel *b);
 int cmp_n_asc(const t_channel *a, const t_channel *b);
 
 #endif

@@ -1,11 +1,11 @@
 #include"optimizer.h"
 
-int cmp_cob_dsc(const t_channel *a, const t_channel *b)
+int cmp_notcob_asc(const t_channel *a, const t_channel *b)
 {
-    if(a->cob < b->cob)
-        return(1);
-    if(a->cob > b->cob)
+    if(a->not_cob < b->not_cob)
         return(-1);
+    if(a->not_cob > b->not_cob)
+        return(1);
     return(0);
 }
 

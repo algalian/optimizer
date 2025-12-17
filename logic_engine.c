@@ -11,6 +11,7 @@ static void compute_cob(t_channel *t, t_globals *g, int inv)
     x = x*0.001;
 	cob = t->a/(1 + (t->b*pow(x, (t->c)))); // TO DO: use a more performative power func
 	t->cob = cob;
+	t->not_cob = 1 - cob;
 	t->inv = inv;
 }
 
@@ -28,19 +29,19 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 	ag_cob = 1;
 	while(snd)
 	{
-		ag_cob *= pow((1-snd->cob), pow(g->beta,i));
+		ag_cob *= pow((1-snd->not_cob), pow(g->beta,i));
 		i++;
 		snd = snd->next;
 	}
-	return(ag_cob);
+	return(1- ag_cob);
 }
 
 static double aggregated_cob(t_channel *t, t_globals *g, double snd_ag_cob)
 {
-	if(t->cob > snd_ag_cob)
-		return(1- (t->cob*pow(snd_ag_cob,g->alpha)));
+	if(t->not_cob < snd_ag_cob)
+		return(1- (t->not_cob*pow(snd_ag_cob,g->alpha)));
 	else 
-		return(1 - (snd_ag_cob*pow(t->cob, g->alpha)));
+		return(1 - (snd_ag_cob*pow(t->not_cob, g->alpha)));
 }
 
 static int count_channels(t_channel *t)
@@ -137,7 +138,7 @@ void logic_engine(t_channel **t, t_globals *g)
 
 	n_channels = count_channels(*t);
 	total = 1000000; // this might be flexible, dynamic or user-defined?
-	acc = 10000;
+	acc = 1000;
 	inv = malloc(sizeof(int) * n_channels);
 	opt = NULL;
 	if(!inv)
@@ -174,7 +175,7 @@ void logic_engine(t_channel **t, t_globals *g)
 			i++;
 		}
 		//display_channels(*t, g);
-		merge_sort(t, cmp_cob_dsc);
+		merge_sort(t, cmp_notcob_asc);
 		//display_channels(*t, NULL);
 		snd_ag_cob = second_tier_aggregated_cob(*t, g);
 		//printf("snd tier ag cob: %f\n",snd_ag_cob);
