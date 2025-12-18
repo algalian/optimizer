@@ -9,7 +9,9 @@ EXTRACT;
 -Pass onto the logic engine the number of channels
 
 TRANSFORM;
-0^-c is not defined. Handle the inv = 0 case separately.
+Check the obtained optimum split against the aggregated coberture & cob calculated manually.
+BRANCH: Do not reorder the list to calculate the aggregated cobertures. Make a copy, compute it from the copy, delete or update it, and move onto the next combo.
+
 LOAD;
 
 
