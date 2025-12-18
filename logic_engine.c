@@ -25,14 +25,14 @@ static void compute_cob(t_channel *t, t_globals *g, int inv)
 	x3 = inv/x2;
 	x4 = x3 * 0.001;
 
-	x = inv/(t->cpm*(g->universe/100));
-    x = x*0.001;
+	//x = inv/(t->cpm*(g->universe/100));
+    //x = x*0.001;
 
 	x1 = restricted_pow(x4, (t->c)); //handle the zero case
 	x2 = x1 * t->b;
 	x3 = x2 + 1;
 	cob = t->a / x3;
-	cob = t->a/(1 + (t->b*restricted_pow(x, (t->c)))); // TO DO: use a more performative power func
+	//cob = t->a/(1 + (t->b*restricted_pow(x, (t->c)))); // TO DO: use a more performative power func
 	t->cob = cob;
 	t->not_cob = 1 - cob;
 	t->inv = inv;
@@ -164,7 +164,7 @@ void logic_engine(t_channel **t, t_globals *g)
 
 	n_channels = count_channels(*t);
 	total = 1000000; // this might be flexible, dynamic or user-defined?
-	acc = 1000;
+	acc = 10000;
 	inv = malloc(sizeof(int) * n_channels);
 	opt = NULL;
 	if(!inv)
@@ -185,7 +185,6 @@ void logic_engine(t_channel **t, t_globals *g)
 		printf("%i\n", inv[i]);
 		i++;
 	}*/
-
 	i = 0;
 	max = 0;
 	checked = 0;
@@ -220,7 +219,6 @@ void logic_engine(t_channel **t, t_globals *g)
 					perror("malloc error in logic engine\n");
 					exit(1);
 				}
-
 			}
 			else
 			{
