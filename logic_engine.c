@@ -1,16 +1,22 @@
 #include"optimizer.h"
 
-
+static long double restricted_pow(long double x, long double y)
+{
+	if(x == 0)
+		return(0);
+	return(pow(x,y));
+}
 
 
 
 static void compute_cob(t_channel *t, t_globals *g, int inv)
 {
-	double cob;
-	double x1;
-	double x2;
-	double x3;
-	double x4;
+	long double cob;
+	long double x1;
+	long double x2;
+	long double x3;
+	long double x4;
+	long double x;
 
 	x1 = g->universe/100;
 
@@ -19,14 +25,14 @@ static void compute_cob(t_channel *t, t_globals *g, int inv)
 	x3 = inv/x2;
 	x4 = x3 * 0.001;
 
-	//x = inv/(t->cpm*(g->universe/100));
-    //x = x*0.001;
+	x = inv/(t->cpm*(g->universe/100));
+    x = x*0.001;
 
-	x1 = pow(x4, (t->c)); //handle the zero case
+	x1 = restricted_pow(x4, (t->c)); //handle the zero case
 	x2 = x1 * t->b;
 	x3 = x2 + 1;
 	cob = t->a / x3;
-	//cob = t->a/(1 + (t->b*pow(x, (t->c)))); // TO DO: use a more performative power func
+	cob = t->a/(1 + (t->b*restricted_pow(x, (t->c)))); // TO DO: use a more performative power func
 	t->cob = cob;
 	t->not_cob = 1 - cob;
 	t->inv = inv;
@@ -35,7 +41,7 @@ static void compute_cob(t_channel *t, t_globals *g, int inv)
 static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 {
    int i;
-   double ag_cob;
+   long double ag_cob;
    t_channel *snd;
 
 	
@@ -54,7 +60,7 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 	return(1- ag_cob);
 }
 
-static double aggregated_cob(t_channel *t, t_globals *g, double snd_ag_cob)
+static double aggregated_cob(t_channel *t, t_globals *g, long double snd_ag_cob)
 {
 	if(t->not_cob < snd_ag_cob)
 		return(1 - (t->not_cob*pow(snd_ag_cob, g->alpha)));
@@ -101,6 +107,7 @@ t_channel *copy_list(const t_channel *src)
 		n->inv = src->inv;
 		n->n = src->n;
 		n->name = src->name;
+		n->not_cob = src->not_cob;
         n->next = NULL;
         if (!head) 
 		{
@@ -131,6 +138,7 @@ void update_list(t_channel *dst, const t_channel*src)
 		dst->inv = src->inv;
 		dst->n = src->n;
 		dst->name = src->name;
+		dst->not_cob = src->not_cob;
         dst = dst->next;
         src = src->next;
     }
@@ -142,9 +150,9 @@ void logic_engine(t_channel **t, t_globals *g)
 	t_channel *opt;
 	int total;
 	int acc;
-	double max;
-	double snd_ag_cob;
-	double ag_cob;
+	long double max;
+	long double snd_ag_cob;
+	long double ag_cob;
 	t_channel *tmp;
 	int n_channels;
 	int i;
@@ -152,7 +160,7 @@ void logic_engine(t_channel **t, t_globals *g)
 	int sum;
 	time_t last_report = 0;
 	unsigned long long checked;
-
+	bool max_found;
 
 	n_channels = count_channels(*t);
 	total = 1000000; // this might be flexible, dynamic or user-defined?
@@ -181,7 +189,7 @@ void logic_engine(t_channel **t, t_globals *g)
 	i = 0;
 	max = 0;
 	checked = 0;
-	while(checked < 6) // what is the exit condition? 
+	while(1) // what is the exit condition? 
 	{	
 		i = 0;
 		tmp = *t;
@@ -192,7 +200,7 @@ void logic_engine(t_channel **t, t_globals *g)
 			tmp = tmp->next;
 			i++;
 		}
-		display_channels(*t, NULL);
+		//display_channels(*t, NULL);
 		merge_sort(t, cmp_notcob_asc);
 		//display_channels(*t, NULL);
 		snd_ag_cob = second_tier_aggregated_cob(*t, g);
@@ -218,6 +226,16 @@ void logic_engine(t_channel **t, t_globals *g)
 			{
 				update_list(opt, *t);
 			}
+			//display_channels(opt, NULL);
+			//printf("with cob %Lf\n ", ag_cob);
+			i = 0;
+			while(i < n_channels)
+			{
+				printf("%i,", inv[i]);
+				i++;
+			}
+			printf("\n");
+			max_found = true;
 			//printf("new max is %f\n", max);
 		}
 		//display_channels(*t, g);
@@ -241,16 +259,17 @@ void logic_engine(t_channel **t, t_globals *g)
 		if (i + 1 < n_channels)
 			inv[i+1] = sum + acc;
 		time_t now = time(NULL);
-        //if (now - last_report >= 1) 
-		//{
-            printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %f\n", checked, inv[0], inv[1], inv[2], inv[3],ag_cob);
+        if (now - last_report >= 1) 
+		{
+            printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %20f\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
 			fflush(stdout);
             last_report = now;
-        //}
+			max_found = false;
+        }
 		checked++;
 	}
     //merge_sort(t, cmp_n_asc);
-	printf("found it!!!  coberture = %f\n", max);
-	display_channels(*t, g);
+	printf("found it!!!  coberture = %20Lf\n", max);
+	display_channels(opt, g);
 	free(inv);
 }
