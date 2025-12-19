@@ -4,6 +4,8 @@ static long double restricted_pow(long double x, long double y)
 {
 	if(x == 0)
 		return(0);
+	if(y < 0)
+		return(1 / pow(x, -y));
 	return(pow(x,y));
 }
 
@@ -62,7 +64,7 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 
 static double aggregated_cob(t_channel *t, t_globals *g, long double snd_ag_cob)
 {
-	if(t->not_cob < snd_ag_cob)
+	if(t->not_cob > snd_ag_cob)
 		return(1 - (t->not_cob*pow(snd_ag_cob, g->alpha)));
 	else 
 		return(1 - (snd_ag_cob*pow(t->not_cob, g->alpha)));
@@ -119,7 +121,6 @@ t_channel *copy_list(const t_channel *src)
             tail->next = n;
             tail = n;
         }
-
         src = src->next;
     }
 
@@ -164,7 +165,7 @@ void logic_engine(t_channel **t, t_globals *g)
 
 	n_channels = count_channels(*t);
 	total = 1000000; // this might be flexible, dynamic or user-defined?
-	acc = 10000;
+	acc = 1000;
 	inv = malloc(sizeof(int) * n_channels);
 	opt = NULL;
 	if(!inv)
@@ -210,31 +211,27 @@ void logic_engine(t_channel **t, t_globals *g)
 		//display_channels(*t,NULL);
         if(ag_cob >= max)
 		{	
-			max = ag_cob;	
-			if(opt == NULL)
+			max = ag_cob;
+
+			free(opt);
+			opt = copy_list(*t);
+			if(!opt)
 			{
-				opt = copy_list(*t);
-				if(!opt)
-				{
-					perror("malloc error in logic engine\n");
-					exit(1);
-				}
+				perror("malloc error in logic engine\n");
+				exit(1);
 			}
-			else
-			{
-				update_list(opt, *t);
-			}
+			max_found = true;
+
 			//display_channels(opt, NULL);
 			//printf("with cob %Lf\n ", ag_cob);
-			i = 0;
+			/*i = 0;
 			while(i < n_channels)
 			{
 				printf("%i,", inv[i]);
 				i++;
 			}
 			printf("\n");
-			max_found = true;
-			//printf("new max is %f\n", max);
+			//printf("new max is %f\n", max);*/
 		}
 		//display_channels(*t, g);
 		//printf("%f\n", ag_cob);
@@ -257,9 +254,9 @@ void logic_engine(t_channel **t, t_globals *g)
 		if (i + 1 < n_channels)
 			inv[i+1] = sum + acc;
 		time_t now = time(NULL);
-        if (now - last_report >= 1) 
+        if (max_found == true) 
 		{
-            printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %20f\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
+            printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %Lf\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
 			fflush(stdout);
             last_report = now;
 			max_found = false;
@@ -267,7 +264,7 @@ void logic_engine(t_channel **t, t_globals *g)
 		checked++;
 	}
     //merge_sort(t, cmp_n_asc);
-	printf("found it!!!  coberture = %20Lf\n", max);
+	printf("found it!!!  coberture = %Lf\n", max);
 	display_channels(opt, g);
 	free(inv);
 }
