@@ -235,6 +235,14 @@ void logic_engine(t_channel **t, t_globals *g)
 		}
 		//display_channels(*t, g);
 		//printf("%f\n", ag_cob);
+		time_t now = time(NULL);
+        if (max_found == true) 
+		{
+            printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %Lf\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
+			fflush(stdout);
+            last_report = now;
+			max_found = false;
+        }
 		i = n_channels - 2;
 		while(i >= 0 && inv[i] == 0)
 		{
@@ -253,14 +261,6 @@ void logic_engine(t_channel **t, t_globals *g)
 		}
 		if (i + 1 < n_channels)
 			inv[i+1] = sum + acc;
-		time_t now = time(NULL);
-        if (max_found == true) 
-		{
-            printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %Lf\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
-			fflush(stdout);
-            last_report = now;
-			max_found = false;
-        }
 		checked++;
 	}
     //merge_sort(t, cmp_n_asc);
