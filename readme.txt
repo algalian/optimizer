@@ -10,7 +10,7 @@ EXTRACT;
 
 TRANSFORM;
 Check the obtained optimum split against the aggregated coberture & cob calculated manually.
-Decouple every function responsible for the calculation of the aggregated cob.
+Decouple every function responsible for the calculation of the aggregated cob backwards.
 
 LOAD;
 
