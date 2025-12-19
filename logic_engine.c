@@ -6,6 +6,8 @@ static long double restricted_pow(long double x, long double y)
 		return(0);
 	if(y < 0)
 		return(1 / pow(x, -y));
+	if(y == 0)
+		return(1);
 	return(pow(x,y));
 }
 
@@ -43,7 +45,7 @@ static void compute_cob(t_channel *t, t_globals *g, int inv)
 static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 {
    int i;
-   long double ag_cob;
+   long double snd_ag_cob;
    t_channel *snd;
 
 	
@@ -51,99 +53,42 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 	snd = snd->next;
 	//display_channels(snd, NULL);
 	i = 0;   
-	ag_cob = 1;
+	snd_ag_cob = 1;
 	while(snd)
 	{
-		ag_cob = ag_cob * pow((snd->not_cob), pow(g->beta,i));
+		snd_ag_cob = snd_ag_cob * restricted_pow((snd->not_cob), restricted_pow(g->beta,i));
 		i++;
 		snd = snd->next;
 	}
 
-	return(1- ag_cob);
+	return(snd_ag_cob);
 }
 
 static double aggregated_cob(t_channel *t, t_globals *g, long double snd_ag_cob)
 {
-	if(t->not_cob > snd_ag_cob)
-		return(1 - (t->not_cob*pow(snd_ag_cob, g->alpha)));
-	else 
-		return(1 - (snd_ag_cob*pow(t->not_cob, g->alpha)));
-}
+	t_channel *fst;
+	long double x1;
+	long double x2;
+	//long double x3;
+	long double not_snd_ag_cob;
 
-static int count_channels(t_channel *t)
-{
-	t_channel *tmp;
-	int i;
-	
-	i = 0;
-	tmp = t;
-	while(tmp)
+
+	not_snd_ag_cob = 1 - snd_ag_cob;
+	fst = t;
+	if(fst->not_cob <  not_snd_ag_cob)
 	{
-		i++;
-		tmp = tmp->next;
+		x1 = restricted_pow(not_snd_ag_cob, g->alpha);
+		x2 = fst->not_cob*x1;
 	}
-	return(i);
-}
-t_channel *copy_list(const t_channel *src) 
-{
-    t_channel *head;
-    t_channel *tail;
-    t_channel *n;
-
-	head = NULL;
-	tail = NULL;
-    while (src != NULL) 
+	else
 	{
-    	n = malloc(sizeof(t_channel));
-        if (!n) 
-		{
-            free_channels(head);
-			perror("malloc error in logic engine\n");
-			exit(1);
-		}
-        n->a = src->a;
-		n->b = src->b;
-		n->c = src->c;
-		n->cpm = src->cpm;
-		n->cob = src->cob;
-		n->inv = src->inv;
-		n->n = src->n;
-		n->name = src->name;
-		n->not_cob = src->not_cob;
-        n->next = NULL;
-        if (!head) 
-		{
-            head = n;
-            tail = n;
-        } 
-		else 
-		{
-            tail->next = n;
-            tail = n;
-        }
-        src = src->next;
-    }
-
-    return(head);
+		x1 = restricted_pow(fst->not_cob, g->alpha);
+		x2 = not_snd_ag_cob * x1;
+	}
+	return(1 - x2);
 }
 
-void update_list(t_channel *dst, const t_channel*src) 
-{
-    while (dst != NULL && src != NULL) 
-	{
-        dst->a = src->a;
-		dst->b = src->b;
-		dst->c = src->c;
-		dst->cpm = src->cpm;
-		dst->cob = src->cob;
-		dst->inv = src->inv;
-		dst->n = src->n;
-		dst->name = src->name;
-		dst->not_cob = src->not_cob;
-        dst = dst->next;
-        src = src->next;
-    }
-}
+
 
 void logic_engine(t_channel **t, t_globals *g)
 {
@@ -165,7 +110,7 @@ void logic_engine(t_channel **t, t_globals *g)
 
 	n_channels = count_channels(*t);
 	total = 1000000; // this might be flexible, dynamic or user-defined?
-	acc = 1000;
+	acc = 10000;
 	inv = malloc(sizeof(int) * n_channels);
 	opt = NULL;
 	if(!inv)
@@ -236,7 +181,7 @@ void logic_engine(t_channel **t, t_globals *g)
 		//display_channels(*t, g);
 		//printf("%f\n", ag_cob);
 		time_t now = time(NULL);
-        if (max_found == true) 
+        if (now - last_report >= 1) 
 		{
             printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %Lf\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
 			fflush(stdout);

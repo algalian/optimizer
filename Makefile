@@ -14,6 +14,7 @@ SRC         = main.c \
               get_next_line.c \
               logic_engine.c \
 			  sort.c \
+			  lists.c \
 			
 
 OBJ         = $(SRC:.c=.o)

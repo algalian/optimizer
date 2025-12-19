@@ -10,7 +10,7 @@ EXTRACT;
 
 TRANSFORM;
 Check the obtained optimum split against the aggregated coberture & cob calculated manually.
-BRANCH: Do not reorder the list to calculate the aggregated cobertures. Make a copy, compute it from the copy, delete or update it, and move onto the next combo.
+Decouple every function responsible for the calculation of the aggregated cob.
 
 LOAD;
 

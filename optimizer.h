@@ -48,6 +48,12 @@ typedef struct globals
     double universe;
 } t_globals;
 
+typedef struct s_ratio
+{
+	int	num;
+	int	den;
+}	t_ratio;
+
 typedef int (*t_cmp) (const t_channel *a, const t_channel *b);
 
 
@@ -64,5 +70,9 @@ void merge_sort(t_channel **head_ref, t_cmp cmp);
 void free_channels(t_channel *head);
 int cmp_notcob_asc(const t_channel *a, const t_channel *b);
 int cmp_n_asc(const t_channel *a, const t_channel *b);
+void update_list(t_channel *dst, const t_channel*src);
+t_channel *copy_list(const t_channel *src);
+int count_channels(t_channel *t);
+
 
 #endif
