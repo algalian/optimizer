@@ -49,18 +49,21 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
    t_channel *snd;
 
 	
-	snd = t;
-	snd = snd->next;
+	if(t != NULL)
+		snd = t->next;
+	else
+		snd = NULL;
 	//display_channels(snd, NULL);
+	//exit(0);
 	i = 0;   
-	snd_ag_cob = 1;
+	snd_ag_cob = 1.0;
 	while(snd)
 	{
-		snd_ag_cob = snd_ag_cob * restricted_pow((snd->not_cob), restricted_pow(g->beta,i));
+		snd_ag_cob = snd_ag_cob * restricted_pow((snd->not_cob), restricted_pow(g->beta,i)); // I think this is it
+		printf("%f = %f * %f")
 		i++;
 		snd = snd->next;
 	}
-
 	return(snd_ag_cob);
 }
 
@@ -77,11 +80,13 @@ static double aggregated_cob(t_channel *t, t_globals *g, long double snd_ag_cob)
 	fst = t;
 	if(fst->not_cob <  not_snd_ag_cob)
 	{
+		//printf("case 1 true\n");
 		x1 = restricted_pow(not_snd_ag_cob, g->alpha);
 		x2 = fst->not_cob*x1;
 	}
 	else
 	{
+		//printf("case 2 true\n");
 		x1 = restricted_pow(fst->not_cob, g->alpha);
 		x2 = not_snd_ag_cob * x1;
 	}
@@ -134,7 +139,7 @@ void logic_engine(t_channel **t, t_globals *g)
 	i = 0;
 	max = 0;
 	checked = 0;
-	while(1) // what is the exit condition? 
+	while(checked < 30) // what is the exit condition? 
 	{	
 		i = 0;
 		tmp = *t;
@@ -147,7 +152,6 @@ void logic_engine(t_channel **t, t_globals *g)
 		}
 		//display_channels(*t, NULL);
 		merge_sort(t, cmp_notcob_asc);
-		//display_channels(*t, NULL);
 		snd_ag_cob = second_tier_aggregated_cob(*t, g);
 		//printf("snd tier ag cob: %f\n",snd_ag_cob);
 		ag_cob = aggregated_cob(*t,g,snd_ag_cob);
@@ -208,8 +212,10 @@ void logic_engine(t_channel **t, t_globals *g)
 			inv[i+1] = sum + acc;
 		checked++;
 	}
-    //merge_sort(t, cmp_n_asc);
-	printf("found it!!!  coberture = %Lf\n", max);
+    //merge_sort(t, cmp_notcob_asc);
+	//display_channels(*t, NULL);
+	//exit(0);
+	printf("found it!!!  coberture = %Lf\n, 2nd tier = %LF\n", max, snd_ag_cob);
 	display_channels(opt, g);
 	free(inv);
 }
