@@ -4,8 +4,6 @@ static long double restricted_pow(long double x, long double y)
 {
 	if(x == 0)
 		return(0);
-	if(y < 0)
-		return(1 / pow(x, -y));
 	if(y == 0)
 		return(1);
 	return(pow(x,y));
@@ -13,57 +11,70 @@ static long double restricted_pow(long double x, long double y)
 
 
 
-static void compute_cob(t_channel *t, t_globals *g, int inv)
+static bool compute_cob(t_channel *t, t_globals *g, int inv, bool contrast)
 {
 	long double cob;
 	long double x1;
 	long double x2;
 	long double x3;
 	long double x4;
-	long double x;
+	long double x5;
+	long double x6;
+	long double x7;
 
+
+	t->inv = inv;
 	x1 = g->universe/100;
-
 	x2 = t->cpm*x1;
 
-	x3 = inv/x2;
+	x3 = t->inv/x2;
 	x4 = x3 * 0.001;
 
 	//x = inv/(t->cpm*(g->universe/100));
-    //x = x*0.001;
+	//x = x*0.001;
 
-	x1 = restricted_pow(x4, (t->c)); //handle the zero case
-	x2 = x1 * t->b;
-	x3 = x2 + 1;
-	cob = t->a / x3;
+	x5 = restricted_pow(x4, (t->c)); //handle the zero case
+	x6 = x5 * t->b;
+	x7 = x6 + 1;
+	cob = t->a / x7;
 	//cob = t->a/(1 + (t->b*restricted_pow(x, (t->c)))); // TO DO: use a more performative power func
 	t->cob = cob;
 	t->not_cob = 1 - cob;
-	t->inv = inv;
+	if(contrast == true)
+	{	
+		printf("inv: %i\nx1:%Lf\nx2:%Lf\nx3:%Lf\nx4:%Lf\nx5:%LF\nx6:%Lf\nx7:%Lf\ncob:%Lf\nnot_cob:%LF\n",inv,x1,x2,x3,x4,x5,x6,x7,t->cob,t->not_cob);
+		contrast = false;
+	}
+	return(contrast);
 }
 
 static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 {
-   int i;
-   long double snd_ag_cob;
-   t_channel *snd;
-
+	int i;
+	long double snd_ag_cob;
+	t_channel *snd;
+	long double exp;
+	long double value;
 	
 	if(t != NULL)
 		snd = t->next;
 	else
 		snd = NULL;
-	//display_channels(snd, NULL);
+	//display_channels(snd, g);
 	//exit(0);
 	i = 0;   
 	snd_ag_cob = 1.0;
 	while(snd)
 	{
-		snd_ag_cob = snd_ag_cob * restricted_pow((snd->not_cob), restricted_pow(g->beta,i)); // I think this is it
-		printf("%f = %f * %f")
+		exp = restricted_pow(g->beta, i);
+		value = pow(snd->not_cob, exp);
+		snd_ag_cob *= value;
+		//printf("%Lf %Lf %Lf\n", exp, value, snd_ag_cob);
 		i++;
 		snd = snd->next;
 	}
+	printf("snd_ag_cob : %Lf, not_snd_ag_cob: %Lf\n", snd_ag_cob, 1 - snd_ag_cob);
+	//exit(0);
 	return(snd_ag_cob);
 }
 
@@ -102,6 +113,7 @@ void logic_engine(t_channel **t, t_globals *g)
 	int total;
 	int acc;
 	long double max;
+	long double max_snd;
 	long double snd_ag_cob;
 	long double ag_cob;
 	t_channel *tmp;
@@ -112,6 +124,7 @@ void logic_engine(t_channel **t, t_globals *g)
 	time_t last_report = 0;
 	unsigned long long checked;
 	bool max_found;
+	bool contrast;
 
 	n_channels = count_channels(*t);
 	total = 1000000; // this might be flexible, dynamic or user-defined?
@@ -139,13 +152,17 @@ void logic_engine(t_channel **t, t_globals *g)
 	i = 0;
 	max = 0;
 	checked = 0;
+	contrast = false;
 	while(checked < 30) // what is the exit condition? 
 	{	
 		i = 0;
 		tmp = *t;
+
 		while(tmp)
 		{
-			compute_cob(tmp,g,inv[i]);
+			//if(inv[0] == 970000 && inv[1] == 10000 && inv[2] == 10000 && inv[3] == 10000)
+			//	contrast = true;
+			contrast = compute_cob(tmp,g,inv[i], contrast);
 			//printf("%f\n",tmp->cob);
 			tmp = tmp->next;
 			i++;
@@ -158,10 +175,10 @@ void logic_engine(t_channel **t, t_globals *g)
 		merge_sort(t, cmp_n_asc);
 		//printf("ag cob: %f\n", ag_cob);
 		//display_channels(*t,NULL);
-        if(ag_cob >= max)
+		if(ag_cob >= max)
 		{	
 			max = ag_cob;
-
+			max_snd = snd_ag_cob;
 			free(opt);
 			opt = copy_list(*t);
 			if(!opt)
@@ -185,13 +202,13 @@ void logic_engine(t_channel **t, t_globals *g)
 		//display_channels(*t, g);
 		//printf("%f\n", ag_cob);
 		time_t now = time(NULL);
-        if (now - last_report >= 1) 
+		if (now - last_report >= 1) 
 		{
-            printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %Lf\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
+			printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %Lf\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
 			fflush(stdout);
-            last_report = now;
+			last_report = now;
 			max_found = false;
-        }
+		}
 		i = n_channels - 2;
 		while(i >= 0 && inv[i] == 0)
 		{
@@ -212,10 +229,10 @@ void logic_engine(t_channel **t, t_globals *g)
 			inv[i+1] = sum + acc;
 		checked++;
 	}
-    //merge_sort(t, cmp_notcob_asc);
+	//merge_sort(t, cmp_notcob_asc);
 	//display_channels(*t, NULL);
 	//exit(0);
-	printf("found it!!!  coberture = %Lf\n, 2nd tier = %LF\n", max, snd_ag_cob);
+	printf("found it!!!  coberture = %Lf, 2nd tier = %LF\n", max, max_snd);
 	display_channels(opt, g);
 	free(inv);
 }

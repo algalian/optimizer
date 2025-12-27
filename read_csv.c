@@ -477,9 +477,9 @@ void read_csv(char *filename, t_channel **t, t_globals *g)
 	i = 0;
 	while(1)
 	{
-		if(line == NULL) 
+		if(line == NULL) //fix it
 		{
-			printf("Warning. Parameters not found\n");
+			printf("Warning. Parameters not found\n"); 
 			exit(1);
 		}
 		line = get_next_line(fd);

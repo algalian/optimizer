@@ -30,22 +30,22 @@
 typedef struct channel
 {   
     char *name;
-    double a;
-    double b;
-    double c;
-    double cpm;
+    long double a;
+    long double b;
+    long double c;
+    long double cpm;
     int n;
-    double cob;
-    double not_cob;
+    long double cob;
+    long double not_cob;
     int inv;
     struct channel *next;
 } t_channel;
 
 typedef struct globals
 {
-    double alpha;
-    double beta;
-    double universe;
+    long double alpha;
+    long double beta;
+    long double universe;
 } t_globals;
 
 typedef struct s_ratio
