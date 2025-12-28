@@ -9,7 +9,17 @@ static long double restricted_pow(long double x, long double y)
 	return(pow(x,y));
 }
 
+void free_list(t_channel *head)
+{
+    t_channel *tmp;
 
+    while (head)
+    {
+        tmp = head->next;
+        free(head);
+        head = tmp;
+    }
+}
 
 static bool compute_cob(t_channel *t, t_globals *g, int inv, bool contrast)
 {
@@ -51,7 +61,7 @@ static bool compute_cob(t_channel *t, t_globals *g, int inv, bool contrast)
 static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 {
 	int i;
-	long double snd_ag_cob;
+	long double prod;
 	t_channel *snd;
 	long double exp;
 	long double value;
@@ -63,19 +73,17 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 	//display_channels(snd, g);
 	//exit(0);
 	i = 0;   
-	snd_ag_cob = 1.0;
+	prod = 1.0;
 	while(snd)
 	{
 		exp = restricted_pow(g->beta, i);
 		value = pow(snd->not_cob, exp);
-		snd_ag_cob *= value;
+		prod *= value;
 		//printf("%Lf %Lf %Lf\n", exp, value, snd_ag_cob);
 		i++;
 		snd = snd->next;
 	}
-	printf("snd_ag_cob : %Lf, not_snd_ag_cob: %Lf\n", snd_ag_cob, 1 - snd_ag_cob);
-	//exit(0);
-	return(snd_ag_cob);
+	return(1 - prod);
 }
 
 static double aggregated_cob(t_channel *t, t_globals *g, long double snd_ag_cob)
@@ -153,11 +161,10 @@ void logic_engine(t_channel **t, t_globals *g)
 	max = 0;
 	checked = 0;
 	contrast = false;
-	while(checked < 30) // what is the exit condition? 
+	while(1) // what is the exit condition? 
 	{	
 		i = 0;
 		tmp = *t;
-
 		while(tmp)
 		{
 			//if(inv[0] == 970000 && inv[1] == 10000 && inv[2] == 10000 && inv[3] == 10000)
@@ -168,18 +175,20 @@ void logic_engine(t_channel **t, t_globals *g)
 			i++;
 		}
 		//display_channels(*t, NULL);
-		merge_sort(t, cmp_notcob_asc);
-		snd_ag_cob = second_tier_aggregated_cob(*t, g);
+		t_channel *sorted = copy_list(*t);
+		merge_sort(&sorted, cmp_notcob_asc);
+		snd_ag_cob = second_tier_aggregated_cob(sorted, g);
+		free_list(sorted);
 		//printf("snd tier ag cob: %f\n",snd_ag_cob);
 		ag_cob = aggregated_cob(*t,g,snd_ag_cob);
-		merge_sort(t, cmp_n_asc);
+		//merge_sort(t, cmp_n_asc);
 		//printf("ag cob: %f\n", ag_cob);
 		//display_channels(*t,NULL);
 		if(ag_cob >= max)
 		{	
 			max = ag_cob;
 			max_snd = snd_ag_cob;
-			free(opt);
+			free_list(opt);
 			opt = copy_list(*t);
 			if(!opt)
 			{
@@ -187,9 +196,8 @@ void logic_engine(t_channel **t, t_globals *g)
 				exit(1);
 			}
 			max_found = true;
-
 			//display_channels(opt, NULL);
-			//printf("with cob %Lf\n ", ag_cob);
+			//printf("with cob: %Lf snd: %LF\n ", max, max_snd);
 			/*i = 0;
 			while(i < n_channels)
 			{
