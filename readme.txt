@@ -9,9 +9,7 @@ EXTRACT;
 -Pass onto the logic engine the number of channels
 
 TRANSFORM;
-Check the obtained optimum split against the aggregated coberture & cob calculated manually.
-Decouple every function responsible for the calculation of the aggregated cob backwards.
-calculate the aggregated cob agains the contrast
+
 LOAD;
 
 
