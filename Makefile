@@ -15,6 +15,9 @@ SRC         = main.c \
               logic_engine.c \
 			  sort.c \
 			  lists.c \
+			  write_csv.c \
+			  parser_csv.c \
+			  parser_interface.c \
 			
 
 OBJ         = $(SRC:.c=.o)

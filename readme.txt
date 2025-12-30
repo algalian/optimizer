@@ -19,7 +19,7 @@ User notes:
 
 This is a beta, so you'll have to run the program from terminal. If running on windows, type ".\optimizer <NAME_OF_THE_CSV_FILE>
 Do NOT merge cells (like in general, not only for this optimizer purposes)
-The names of the parameters are assumed to be a, b, c, cpm and universe. If you wanna name them differently, please pass them as arguments in that order.
+The names of the parameters are assumed to be A, B, C, CPM, Universo, Medios Dig, TV + Dig. If you wanna name them differently, please pass them as arguments in that order.
 The names must match your arguments to the actual names of the csv.
 Download the file as a CSV in the sheet where the parameters are.
 THe cells containing the parameter names must only contain the name and nothing else.

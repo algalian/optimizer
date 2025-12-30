@@ -306,7 +306,7 @@ static void populate_channels(t_channel *head, int fd, int pos, char *needle)
 
 
 
-static void get_universe(char *filename, t_globals *g)
+static void get_universe(char **args, t_globals *g)
 {
 	int fd;
 	int i;
@@ -318,10 +318,10 @@ static void get_universe(char *filename, t_globals *g)
 	double tmp;
 	char *endptr;
 
-	fd = open(filename, O_RDONLY);
+	fd = open(args[0], O_RDONLY);
 	if(fd < 0)
 	{
-		fprintf(stderr, "Error: cannot open file '%s'\n", filename);
+		fprintf(stderr, "Error: cannot open file '%s'\n", args[0]);
 		exit(1);
 	}
 	i = 0;
@@ -333,7 +333,7 @@ static void get_universe(char *filename, t_globals *g)
 			exit(1);
 		}
 		line = get_next_line(fd);
-		needle = strstr(line, ",Universo");
+		needle = strstr(line, ft_strjoin(",", args[5]));
 		if(needle) //TO DO, Refactor and make it resilient to both commas and !commas)
 		{
 			needle++;
@@ -366,7 +366,7 @@ static void get_universe(char *filename, t_globals *g)
 			tmp = strtod(s, &endptr);
 			if(*endptr != '\0' || endptr == s)
 			{
-				printf("Error in param universe. %s is not a number\n", s);
+				printf("Error in param %s. %s is not a number\n", args[5],s);
 				exit(1);
 			}	
 			g->universe = tmp;
@@ -459,7 +459,7 @@ void get_globals(char *filename, int old_fd, t_globals *g)
 	}
 }
 
-void read_csv(char *filename, t_channel **t, t_globals *g)
+void read_csv(char **args, t_channel **t, t_globals *g)
 {
 	int fd;
 	int i;
@@ -467,17 +467,18 @@ void read_csv(char *filename, t_channel **t, t_globals *g)
 	int pos;
 	char *needle;
 
-	fd = open(filename, O_RDONLY);
+	fd = open(args[0], O_RDONLY);
 	if(fd < 0)
 	{
-		fprintf(stderr, "Error: cannot open file '%s'\n", filename);
+		fprintf(stderr, "Error: cannot open file '%s'\n", args[0]);
 		exit(1);
 	}
 
 	i = 0;
+	//line = get_next_line(fd);
 	while(1)
 	{
-		if(line == NULL) //fix it
+		if(line == NULL && i > 0) //fix it
 		{
 			printf("Warning. Parameters not found\n"); 
 			exit(1);
@@ -488,7 +489,7 @@ void read_csv(char *filename, t_channel **t, t_globals *g)
 		{
 			pos = locate_pos(",Channel,",line);
 			build_channels(t, fd, pos);
-			fd = backtrack(i, filename, fd);
+			fd = backtrack(i, args[0], fd);
 			line = get_next_line(fd);
 			//printf("we are now on %s\n", line);
 			pos = locate_pos(needle, line);
@@ -502,8 +503,8 @@ void read_csv(char *filename, t_channel **t, t_globals *g)
 		free(line);
 		i++;
 	}
-	get_globals(filename,fd, g);
+	get_globals(args[0],fd, g);
 	//printf("%f %f\n", g->alpha, g->beta);
 	//exit(0);
-	get_universe(filename, g);
+	get_universe(args, g);
 }

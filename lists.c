@@ -74,3 +74,16 @@ void update_list(t_channel *dst, const t_channel*src)
         src = src->next;
     }
 }
+
+
+void free_channels(t_channel *head)
+{
+    t_channel *tmp;
+
+    while (head)
+    {
+        tmp = head->next;   
+        free(head);         
+        head = tmp;         
+    }
+}

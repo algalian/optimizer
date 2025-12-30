@@ -1,33 +1,25 @@
 #include "optimizer.h"
 
-
-void free_channels(t_channel *head)
-{
-    t_channel *tmp;
-
-    while (head)
-    {
-        tmp = head->next;   
-        free(head);         
-        head = tmp;         
-    }
-}
-
-
-
 int main(int argc, char **argv)
 {
-    t_channel *t;
-    //t_channel *tmp;
-    t_globals g;
+    t_parser parser;
+    char **cols;
+    int count;
+    int i;
 
-
-    t = NULL;
-    read_csv(argv[1], &t, &g);
-    //printf("File succesfully read and loaded. Displaying parameters...\n");
-    //display_channels(t, &g);
-    //printf("proceeding to calculate. Please wait...\n");
-    logic_engine(&t, &g);
-    free_channels(t);
-    return(0);
+    count = 0;
+    cols = NULL;
+    use_csv_parser(&parser);
+    if (parser.open(&parser, argv[1]) != 0)
+        return dprintf(2, "Failed to open file\n"), 1;
+    parser.read_header(&parser, &cols, &count);
+    printf("HEADER COLUMNS (%d):\n", count);
+    i = 0;
+    while(i < count)
+    {
+        printf("[%s]\n", cols[i]);
+        i++:
+    }
+    free_cells(cols, count);
+    parser.close(&parser);
 }
