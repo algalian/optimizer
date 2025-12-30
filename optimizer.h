@@ -41,6 +41,18 @@ typedef struct channel
     struct channel *next;
 } t_channel;
 
+typedef struct s_colmap {
+    int name;
+    int a;
+    int b;
+    int c;
+    int cpm;
+    int n;
+    int cob;
+    int not_cob;
+    int inv;
+    // add new fields here if struct grows
+} t_colmap;
 typedef struct globals
 {
     long double alpha;
@@ -55,6 +67,8 @@ typedef struct s_ratio
 }	t_ratio;
 
 typedef int (*t_cmp) (const t_channel *a, const t_channel *b);
+
+enum state { FIELD_START, IN_FIELD, IN_QUOTED, IN_QUOTED_ESC };
 
 
 void read_csv(char **args, t_channel **t, t_globals *g);
@@ -83,6 +97,7 @@ void write_csv();
 typedef struct s_parser 
 {
     void    *ctx;   // Parser internal state (e.g., FILE*)
+    char    delimiter;
     int     (*open)(struct s_parser *, const char *path);
     int     (*read_header)(struct s_parser *, char ***out_columns, int *out_count);
     int     (*read_row)(struct s_parser *, char ***out_cells, int *out_count);
@@ -95,5 +110,20 @@ void    use_csv_parser(t_parser *p);
 /* Helper for freeing rows/headers returned by read_row/read_header */
 void    free_cells(char **cells, int count);
 int load_channels_from_file(const char *filepath, char **fields, t_channel **list, t_globals *g);
+
+
+int find_col(char **columns, int col_count, const char *name);
+
+
+int tokenize_csv_line(const char *line, char delimiter, char ***out_cells, int *out_count);
+
+
+
+
+void use_tsv_parser(t_parser *p);
+
+
+t_parser make_parser_for_file(const char *filename);
+
 
 #endif

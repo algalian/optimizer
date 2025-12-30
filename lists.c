@@ -87,3 +87,21 @@ void free_channels(t_channel *head)
         head = tmp;         
     }
 }
+
+static t_channel *new_node(void)
+{
+    t_channel *n = calloc(1, sizeof(t_channel));
+    return n;
+}
+
+static void append_node(t_channel **list, t_channel *node)
+{
+    if (!*list) {
+        *list = node;
+        return;
+    }
+    t_channel *tmp = *list;
+    while (tmp->next)
+        tmp = tmp->next;
+    tmp->next = node;
+}

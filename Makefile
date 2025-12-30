@@ -18,7 +18,9 @@ SRC         = main.c \
 			  write_csv.c \
 			  parser_csv.c \
 			  parser_interface.c \
-			
+			  col_mapping.c \
+			  loader.c \
+			  parser_tsv.c \
 
 OBJ         = $(SRC:.c=.o)
 

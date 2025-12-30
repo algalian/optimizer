@@ -1,0 +1,26 @@
+#include "optimizer.h"
+
+
+int find_col(char **columns, int col_count, const char *name)
+{
+    for (int i = 0; i < col_count; i++)
+        if (strcmp(columns[i], name) == 0)
+            return i;
+    return -1;
+}
+
+int build_colmap(t_colmap *map, char **header, int hcount, char **fields)
+{
+    map->name    = find_col(header, hcount, fields[6]); //fix this from main
+    map->a       = find_col(header, hcount, fields[1]);
+    map->b       = find_col(header, hcount, fields[2]);
+    map->c       = find_col(header, hcount, fields[3]);
+    map->cpm     = find_col(header, hcount, fields[4]);
+
+
+    /* validate all are found */
+    for (int *p = (int *)map; p < (int *)(map + 1); p++)
+        if (*p < 0)
+            return -1;
+    return 0;
+}

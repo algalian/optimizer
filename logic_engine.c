@@ -2,10 +2,6 @@
 
 static long double restricted_pow(long double x, long double y)
 {
-	if(x == 0)
-		return(0);
-	if(y == 0)
-		return(1);
 	return(pow(x,y));
 }
 
@@ -32,8 +28,13 @@ static bool compute_cob(t_channel *t, t_globals *g, int inv, bool contrast)
 	long double x6;
 	long double x7;
 
-
 	t->inv = inv;
+	if(t->inv == 0)
+	{
+		t->cob = 0;
+		t->not_cob = 1;
+		return(contrast);
+	}
 	x1 = g->universe/100;
 	x2 = t->cpm*x1;
 
@@ -76,7 +77,7 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 	prod = 1.0;
 	while(snd)
 	{
-		exp = restricted_pow(g->beta, i);
+		exp = restricted_pow(g->alpha, i);
 		value = pow(snd->not_cob, exp);
 		prod *= value;
 		//printf("%Lf %Lf %Lf\n", exp, value, snd_ag_cob);
