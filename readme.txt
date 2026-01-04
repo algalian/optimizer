@@ -1,12 +1,11 @@
 Dev notes:
 
 EXTRACT;
--Handle commas being inside the cells->the reading should allow both scenarios (!commas && commas)
--Add a retrieval for the total budget and save it as a global.
--Add a user defined accuracy/granularity value expressed as a ratio
--Refactor the read_csv func and split it in submodules
--Check for leaks
--Pass onto the logic engine the number of channels
+-Detect inconsistent column counts (very important)
+-Add row numbers to errors
+-Optional whitespace trimming
+-Add limits (max fields / line length)
+-move to XLSX
 
 TRANSFORM;
 

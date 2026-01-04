@@ -9,8 +9,6 @@ LIBS        = -lm
 
 # Project sources
 SRC         = main.c \
-              read_csv.c \
-			  read_csv_utils.c \
               get_next_line.c \
               logic_engine.c \
 			  sort.c \
@@ -21,6 +19,11 @@ SRC         = main.c \
 			  col_mapping.c \
 			  loader.c \
 			  parser_tsv.c \
+			  record_reader.c \
+			  col_schema.c \
+			  numeric.c \
+			  tokenizer_tsv.c \
+			  tokenizer_csv.c \
 
 OBJ         = $(SRC:.c=.o)
 

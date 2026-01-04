@@ -2,5 +2,4 @@
 
 void write_csv()
 {
-    return(0);
 }

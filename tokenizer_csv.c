@@ -1,123 +1,149 @@
 #include "optimizer.h"
 
 /*
-** Robust CSV tokenizer: supports
-** - quoted fields
-** - escaped quotes ("")
-** - variable delimiter (, ; \t)
+** Strict CSV tokenizer
+**
+** Rules enforced:
+**  - Quotes only allowed at start of field
+**  - Quoted fields must end with delimiter or EOL
+**  - Escaped quotes must be ""
+**  - No garbage allowed after closing quote
+**  - Unterminated quotes are reported
 */
 
-
-int tokenize_csv_line(const char *line, char delimiter, char ***out_cells, int *out_count)
+int tokenize_csv_line(const char *buf,
+                      char delimiter,
+                      char ***out_cells,
+                      int *out_count,
+                      int *out_in_quotes)
 {
-    enum { FIELD_START, IN_FIELD, IN_QUOTED, IN_QUOTED_ESC } state = FIELD_START;
+    enum {
+        FIELD_START,
+        IN_FIELD,
+        IN_QUOTED,
+        AFTER_QUOTE
+    } state = FIELD_START;
 
     char **cells = NULL;
     int count = 0;
 
-    size_t bufcap = 64;
-    size_t bi = 0;
-    char *buffer = malloc(bufcap);
-    if (!buffer)
+    size_t cap = 64;
+    size_t len = 0;
+    char *field = malloc(cap);
+
+    if (!field)
         return -1;
 
-    #define PUSH(c) do { \
-        if (bi + 1 >= bufcap) { \
-            bufcap *= 2; \
-            char *tmp = realloc(buffer, bufcap); \
-            if (!tmp) { free(buffer); return -1; } \
-            buffer = tmp; \
-        } \
-        buffer[bi++] = (c); \
-    } while (0)
+#define PUSH_CHAR(ch) do { \
+    if (len + 1 >= cap) { \
+        cap *= 2; \
+        char *tmp = realloc(field, cap); \
+        if (!tmp) goto alloc_fail; \
+        field = tmp; \
+    } \
+    field[len++] = (ch); \
+} while (0)
 
-    /* Handle UTF-8 BOM (if present) */
-    if ((unsigned char)line[0] == 0xEF &&
-        (unsigned char)line[1] == 0xBB &&
-        (unsigned char)line[2] == 0xBF)
-        line += 3;
+#define PUSH_FIELD() do { \
+    field[len] = '\0'; \
+    char *copy = strdup(field); \
+    if (!copy) goto alloc_fail; \
+    char **tmp = realloc(cells, sizeof(char *) * (count + 1)); \
+    if (!tmp) { free(copy); goto alloc_fail; } \
+    cells = tmp; \
+    cells[count++] = copy; \
+    len = 0; \
+} while (0)
 
-    for (int i = 0; ; i++) {
-        char c = line[i];
-        int end = (c == '\0' || c == '\n' || c == '\r');
+    for (size_t i = 0;; i++) {
+        char c = buf[i];
+        int end = (c == '\0');
+
+        if (!end && (c == '\n' || c == '\r'))
+            end = 1;
 
         switch (state) {
 
         case FIELD_START:
             if (end) {
-				// empty field at end
-                cells = realloc(cells, sizeof(char*) * (count + 1));
-                cells[count++] = strdup("");
-                goto finish;
+                PUSH_FIELD();
+                goto done;
+            }
+            if (c == delimiter) {
+                PUSH_FIELD();
             }
             else if (c == '"') {
                 state = IN_QUOTED;
             }
-            else if (c == delimiter) {
-                cells = realloc(cells, sizeof(char*) * (count + 1));
-                cells[count++] = strdup("");
-            }
             else {
-                PUSH(c);
+                PUSH_CHAR(c);
                 state = IN_FIELD;
             }
             break;
 
         case IN_FIELD:
             if (end || c == delimiter) {
-                PUSH('\0');
-                cells = realloc(cells, sizeof(char*) * (count + 1));
-                cells[count++] = strdup(buffer);
-                bi = 0;
+                PUSH_FIELD();
                 state = FIELD_START;
-            } else {
-                PUSH(c);
+                if (end) goto done;
+            }
+            else if (c == '"') {
+                /* Illegal quote inside unquoted field */
+                goto parse_error;
+            }
+            else {
+                PUSH_CHAR(c);
             }
             break;
 
         case IN_QUOTED:
             if (end) {
-				// unterminated quote → still accept
-                PUSH('\0');
-                cells = realloc(cells, sizeof(char*) * (count + 1));
-                cells[count++] = strdup(buffer);
-                goto finish;
+                *out_in_quotes = 1;
+                goto done;
             }
-            else if (c == '"') {
-                state = IN_QUOTED_ESC;
+            if (c == '"') {
+                if (buf[i + 1] == '"') {
+                    PUSH_CHAR('"');
+                    i++; /* skip escaped quote */
+                }
+                else {
+                    state = AFTER_QUOTE;
+                }
             }
             else {
-                PUSH(c);
+                PUSH_CHAR(c);
             }
             break;
 
-        case IN_QUOTED_ESC:
-            if (c == '"') {
-                PUSH('"');
-                state = IN_QUOTED;
-            }
-            else if (c == delimiter || end) {
-                PUSH('\0');
-                cells = realloc(cells, sizeof(char*) * (count + 1));
-                cells[count++] = strdup(buffer);
-                bi = 0;
+        case AFTER_QUOTE:
+            if (c == delimiter) {
+                PUSH_FIELD();
                 state = FIELD_START;
             }
+            else if (end) {
+                PUSH_FIELD();
+                goto done;
+            }
             else {
-				// unexpected char, treat as raw
-                PUSH(c);
-                state = IN_FIELD;
+                /* Garbage after closing quote */
+                goto parse_error;
             }
             break;
         }
-
-        if (end)
-            break;
     }
 
-finish:
+done:
+    free(field);
     *out_cells = cells;
     *out_count = count;
-    free(buffer);
+    *out_in_quotes = (state == IN_QUOTED);
     return count;
+
+parse_error:
+alloc_fail:
+    for (int i = 0; i < count; i++)
+        free(cells[i]);
+    free(cells);
+    free(field);
+    return -1;
 }
