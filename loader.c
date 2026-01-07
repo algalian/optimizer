@@ -110,6 +110,9 @@ while (1)
 }
 
 
+
+
+
     /* -------- MAP COLUMNS -------- */
     t_colmap map;
     if (build_colmap(&map, header, hcount, fields) != 0) {
@@ -127,7 +130,8 @@ while (1)
     int ccount = 0;
     row_num = 1;
 
-    while (1) {
+    while (1) 
+    {
         err = p.read_row(&p, &cells, &ccount);
 
         if (err == PARSE_EOF)
@@ -158,30 +162,33 @@ while (1)
 
         /* -------- STRING FIELD -------- */
         node->name = strdup(cells[map.name]);
-        if (!node->name) {
-            fprintf(stderr,
-                    "Error: out of memory at row %d (column '%s')\n",
-                    row_num, fields[map.name]);
+        if (!node->name) 
+        {
+            fprintf(stderr, "Error: out of memory at row %d (column '%s')\n", row_num, fields[map.name]);
             free(node);
             goto fail;
+        }
+        if(node->name[0] == '\0')
+        {
+            break;
         }
 
         /* -------- NUMERIC FIELDS -------- */
         if (parse_long_double(cells[map.a], &node->a,
-                               row_num, fields[1]) != 0 ||
+                               row_num, fields[0]) != 0 ||
             parse_long_double(cells[map.b], &node->b,
-                               row_num, fields[2]) != 0 ||
+                               row_num, fields[1]) != 0 ||
             parse_long_double(cells[map.c], &node->c,
-                               row_num, fields[3]) != 0 ||
+                               row_num, fields[2]) != 0 ||
             parse_long_double(cells[map.cpm], &node->cpm,
-                               row_num, fields[4]) != 0) {
+                               row_num, fields[3]) != 0) 
+        {
             free(node->name);
             free(node);
             goto fail;
         }
-
+        node->n = row_num;
         append_node(list, node);
-
         free_cells(cells, ccount);
         cells = NULL;
         ccount = 0;

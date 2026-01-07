@@ -51,7 +51,7 @@ int main(int argc, char **argv)
         free_channels(channels);
         return EXIT_FAILURE;
     }
-
+    display_channels(channels, NULL);
     free_channels(channels);
     return EXIT_SUCCESS;
 }
