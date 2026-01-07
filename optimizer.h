@@ -61,6 +61,9 @@ typedef struct globals
     long double alpha;
     long double beta;
     long double universe;
+    long double acc;
+    int has_universo;
+    int has_corr_dupl;
 } t_globals;
 
 typedef struct s_ratio
@@ -113,7 +116,6 @@ int load_channel_from_row(t_channel       *dst,
                           const t_column_spec *schema);
 int build_colmap(t_colmap *map, char **header, int hcount, char **fields);
 
-
 /* ===================== PARSER INTERFACE ===================== */
 
 typedef enum e_parse_error {
@@ -140,6 +142,11 @@ typedef struct s_parser {
     void (*close)(struct s_parser *);
 } t_parser;
 
+typedef struct s_corr_state {
+    int col;
+    int stage; /* 0 = inactive, 1 = read alpha next, 2 = read beta next */
+} t_corr_state;
+
 /* ===================== API ===================== */
 
 int make_parser_for_file(const char *filename, t_parser *out);
@@ -165,8 +172,7 @@ void use_tsv_parser(t_parser *p);
 
 int load_channels_from_file(const char *filepath,
                             char **unused,
-                            t_channel **list,
-                            t_globals *g);
+                            t_channel **list, t_globals *g);
 
 void free_cells(char **cells, int count);
 

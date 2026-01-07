@@ -11,7 +11,7 @@ int find_col(char **columns, int col_count, const char *name)
 
 int build_colmap(t_colmap *map, char **header, int hcount, char **fields)
 {
-    map->name    = find_col(header, hcount, fields[5]); //fix this from main
+    map->name    = find_col(header, hcount, fields[4]); //fix this from main
     map->a       = find_col(header, hcount, fields[0]);
     map->b       = find_col(header, hcount, fields[1]);
     map->c       = find_col(header, hcount, fields[2]);

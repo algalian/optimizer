@@ -72,3 +72,4 @@ int make_parser_for_file(const char *filename, t_parser *out)
     out->delimiter = d;
     return 0;
 }
+

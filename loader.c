@@ -13,7 +13,7 @@ static int row_matches_header(char **row,int count, char **fields)
     int j;
 
     i = 0;
-    while(i < 3)
+    while(i < 3) //fix magic number
     {
         j = 0;
         while(row[j])
@@ -34,14 +34,112 @@ static int row_matches_header(char **row,int count, char **fields)
     return(1);
 }
 
-int load_channels_from_file(const char *filepath,
-                            char **fields,
-                            t_channel **list,
-                            t_globals *g)
+
+static int find_cell(char **row, int count, const char *needle)
+{
+    //printf("needle: %s\n", needle);
+    for (int i = 0; i < count; i++)
+        if (row[i] && strcmp(row[i], needle) == 0)
+            return i;
+    return -1;
+}
+static int try_load_universe(char **row,
+                             int count,
+                             t_globals *g,
+                             int row_num, char *needle)
+{
+    int col = find_cell(row, count, needle);
+    if (col < 0)
+        return 0; /* not here */
+
+    if (col + 1 >= count) {
+        fprintf(stderr,
+                "Error: %s value missing at row %d\n",
+                needle,row_num);
+        return -1;
+    }
+
+    if (parse_long_double(row[col + 1],
+                          &g->universe,
+                          row_num,
+                          "Universo") != 0)
+        return -1;
+
+    g->has_universo = 1;
+    return 1;
+}
+
+static int try_load_corr_dupl(char **row,
+                              int count,
+                              t_globals *g,
+                              t_corr_state *c,
+                              int row_num, char *needle)
+{
+    /* Stage 0: look for the label */
+    if (c->stage == 0) 
+    {
+        int col = find_cell(row, count, needle);
+        if (col >= 0) 
+        {
+            c->col = col;
+            c->stage = 1;
+           //printf("the label has been found\n");
+        }
+        return 0;
+
+    }
+
+    /* Stage 1: alpha */
+    if (c->stage == 1) 
+    {
+        //printf("does it even enter here\n");
+        if (c->col >= count) {
+            fprintf(stderr,
+                    "Error: %s alpha missing at row %d\n", needle,
+                    row_num);
+            return -1;
+        }
+
+        if (parse_long_double(row[c->col], &g->alpha, row_num, "alpha") != 0)
+            return -1;
+        //printf("alpha found %Lf\n",g->alpha); 
+        c->stage = 2;
+        return 0;
+    }
+
+    /* Stage 2: beta */
+    if (c->stage == 2) 
+    {
+        if (c->col >= count) {
+            fprintf(stderr,
+                    "Error: beta missing at row %d\n",
+                    row_num);
+            return -1;
+        }
+
+        if (parse_long_double(row[c->col],
+                              &g->beta,
+                              row_num,
+                              "beta") != 0)
+            return -1;
+
+        g->has_corr_dupl = 1;
+        c->stage = 0;
+        c->col = -1;
+    }
+
+    return 0;
+}
+
+
+int load_channels_from_file(const char *filepath, char **fields, t_channel **list, t_globals *g)
 {
     t_parser p;
     t_parse_error err;
+    t_corr_state corr = { .col = -1, .stage = 0 };
+
     int j;
+
 
     *list = NULL;
 
@@ -92,6 +190,17 @@ while (1)
         p.close(&p);
         return -1;
     }
+
+
+    /* Try load Universo */
+    int r = try_load_universe(header, hcount, g, row_num, fields[6]);
+    if (r < 0)
+        goto fail;
+
+    /* Try load Corr. Dupl */
+    if (try_load_corr_dupl(header, hcount, g, &corr, row_num, fields[5]) < 0)
+        goto fail;
+
     if (row_matches_header(header, hcount, fields) == 1)
     {
         /*printf("we found 'em at %i\n", j);
@@ -108,10 +217,6 @@ while (1)
     hcount = 0;
     j++;
 }
-
-
-
-
 
     /* -------- MAP COLUMNS -------- */
     t_colmap map;
@@ -196,6 +301,12 @@ while (1)
     }
 
     p.close(&p);
+
+    if (!g->has_universo)
+    fprintf(stderr, "Warning: Universo not found\n");
+
+    if (!g->has_corr_dupl)
+    fprintf(stderr, "Warning: Corr. Dupl not found\n");
     return 0;
 
 fail:
@@ -205,3 +316,6 @@ fail:
     p.close(&p);
     return -1;
 }
+
+
+

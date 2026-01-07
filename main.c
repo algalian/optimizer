@@ -30,28 +30,29 @@ int main(int argc, char **argv)
     **
     ** Order MUST match expectations in build_colmap()
     ** -------------------------------------------------- */
-    char *fields[] = {
-             /* [0] unused (argv compatibility removed) */
-        "A",             /* [1] */
-        "B",             /* [2] */
-        "C",             /* [3] */
-        "CPM Compra",           /* [4] */
-        "Corr. Dupl",    /* [5] (currently unused) */
-        "Channel",       /* [6] */
-        "Universo",      /* [7] (currently unused) */
-        "0.001",         /* [8] alpha or ratio placeholder */
+    char *fields[] = 
+    {        
+        "A",             
+        "B",             
+        "C",             
+        "CPM Compra",
+        "Channel",             
+        "Corr Dupl",   
+        "Universo 000",      
+        "0.001",         
         NULL
     };
 
     /* --------------------------------------------------
     ** LOAD DATA
     ** -------------------------------------------------- */
-    if (load_channels_from_file(input_path, fields, &channels, &globals) != 0) {
+    if (load_channels_from_file(input_path, fields, &channels, &globals) != 0) 
+    {
         fprintf(stderr, "Error: failed to load channels from '%s'\n", input_path);
         free_channels(channels);
         return EXIT_FAILURE;
     }
-    display_channels(channels, NULL);
+    display_channels(channels, &globals);
     free_channels(channels);
     return EXIT_SUCCESS;
 }
