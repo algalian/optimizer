@@ -7,6 +7,33 @@ int parse_long_double(const char *s,
                       int row,
                       const char *col_name);
 
+static int row_matches_header(char **row,int count, char **fields)
+{
+    int i;
+    int j;
+
+    i = 0;
+    while(i < 3)
+    {
+        j = 0;
+        while(row[j])
+        {
+            if(strcmp(row[j],fields[i]) == 0)
+            {
+                break;
+            }
+            j++;
+        }
+        if(j >= count)
+        {
+            //printf("field %s not found\n", fields[i]);
+            return (0);
+        }
+        i++;
+    }
+    return(1);
+}
+
 int load_channels_from_file(const char *filepath,
                             char **fields,
                             t_channel **list,
@@ -14,6 +41,7 @@ int load_channels_from_file(const char *filepath,
 {
     t_parser p;
     t_parse_error err;
+    int j;
 
     *list = NULL;
 
@@ -31,16 +59,56 @@ int load_channels_from_file(const char *filepath,
         return -1;
     }
 
-    /* -------- READ HEADER -------- */
-    char **header = NULL;
-    int hcount = 0;
+    /* -------- FIND HEADER -------- */
+char **header = NULL;
+int hcount = 0;
+int row_num = 0;
+/*printf("let it be known that the fields are\n");
+j = 0;
+while(fields[j])
+{
+    printf("%s\n", fields[j]);
+    j++;
+}
+printf("these above\n");*/
+j = 0;
+while (1) 
+{
+    err = p.read_row(&p, &header, &hcount);
+    row_num++;
 
-    err = p.read_header(&p, &header, &hcount);
-    if (err != PARSE_OK) {
-        fprintf(stderr, "Error: failed to read header\n");
+    if (err == PARSE_EOF) {
+        fprintf(stderr,
+                "Error: header not found in '%s'\n",
+                filepath);
         p.close(&p);
         return -1;
     }
+
+    if (err != PARSE_OK) {
+        fprintf(stderr,
+                "Error: parse failure before header (row %d)\n",
+                row_num);
+        p.close(&p);
+        return -1;
+    }
+    if (row_matches_header(header, hcount, fields) == 1)
+    {
+        /*printf("we found 'em at %i\n", j);
+        int i = 0;
+        while(header[i])
+        {
+            printf("%s\n", header[i]);
+            i++;
+        }*/
+        break;
+    }
+    free_cells(header, hcount);
+    header = NULL;
+    hcount = 0;
+    j++;
+}
+
 
     /* -------- MAP COLUMNS -------- */
     t_colmap map;
@@ -57,7 +125,7 @@ int load_channels_from_file(const char *filepath,
     /* -------- READ DATA ROWS -------- */
     char **cells = NULL;
     int ccount = 0;
-    int row_num = 1;
+    row_num = 1;
 
     while (1) {
         err = p.read_row(&p, &cells, &ccount);

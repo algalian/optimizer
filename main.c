@@ -31,11 +31,11 @@ int main(int argc, char **argv)
     ** Order MUST match expectations in build_colmap()
     ** -------------------------------------------------- */
     char *fields[] = {
-        NULL,           /* [0] unused (argv compatibility removed) */
+             /* [0] unused (argv compatibility removed) */
         "A",             /* [1] */
         "B",             /* [2] */
         "C",             /* [3] */
-        "CPM",           /* [4] */
+        "CPM Compra",           /* [4] */
         "Corr. Dupl",    /* [5] (currently unused) */
         "Channel",       /* [6] */
         "Universo",      /* [7] (currently unused) */
