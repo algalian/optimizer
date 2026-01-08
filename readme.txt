@@ -1,13 +1,15 @@
 Dev notes:
 
 EXTRACT;
--Detect inconsistent column counts (very important)
+-Detect inconsistent column counts
 -Add row numbers to errors
 -Optional whitespace trimming
 -Add limits (max fields / line length)
 -move to XLSX
 
 TRANSFORM;
+-
+
 
 LOAD;
 

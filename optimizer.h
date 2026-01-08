@@ -62,8 +62,10 @@ typedef struct globals
     long double beta;
     long double universe;
     long double acc;
+    long double budget;
     int has_universo;
     int has_corr_dupl;
+    int has_budget;
 } t_globals;
 
 typedef struct s_ratio

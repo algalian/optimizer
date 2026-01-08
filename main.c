@@ -14,6 +14,8 @@ int main(int argc, char **argv)
     const char *input_path;
     t_channel  *channels = NULL;
     t_globals   globals = {0};
+    char *end;
+    long double val;
 
     /* --------------------------------------------------
     ** ARGUMENT VALIDATION
@@ -39,7 +41,7 @@ int main(int argc, char **argv)
         "Channel",             
         "Corr Dupl",   
         "Universo 000",      
-        "0.001",         
+        "0.00217",     //support ratios  
         NULL
     };
 
@@ -52,7 +54,10 @@ int main(int argc, char **argv)
         free_channels(channels);
         return EXIT_FAILURE;
     }
-    display_channels(channels, &globals);
+    val = strtold(fields[7], &end);
+    globals.acc = val;
+    //display_channels(channels, &globals);
+    logic_engine(&channels, &globals);
     free_channels(channels);
     return EXIT_SUCCESS;
 }

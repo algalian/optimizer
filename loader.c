@@ -58,13 +58,23 @@ static int try_load_universe(char **row,
                 needle,row_num);
         return -1;
     }
-
-    if (parse_long_double(row[col + 1],
-                          &g->universe,
+    if(strcmp(needle, "Presupuesto") == 0)
+    {
+        if (parse_long_double(row[col + 1],
+                         &g->budget,
                           row_num,
-                          "Universo") != 0)
+                          "Presupuesto") != 0)
         return -1;
-
+    }
+    else
+    {
+        if (parse_long_double(row[col + 1],
+                            &g->universe,
+                            row_num,
+                            "Universo") != 0)
+            return -1;
+    }
+    
     g->has_universo = 1;
     return 1;
 }
@@ -196,7 +206,9 @@ while (1)
     int r = try_load_universe(header, hcount, g, row_num, fields[6]);
     if (r < 0)
         goto fail;
-
+    int b = try_load_universe(header, hcount, g, row_num, "Presupuesto");
+    if(b < 0 )
+        goto fail;
     /* Try load Corr. Dupl */
     if (try_load_corr_dupl(header, hcount, g, &corr, row_num, fields[5]) < 0)
         goto fail;

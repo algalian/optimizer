@@ -101,13 +101,13 @@ static double aggregated_cob(t_channel *t, t_globals *g, long double snd_ag_cob)
 	if(fst->not_cob <  not_snd_ag_cob)
 	{
 		//printf("case 1 true\n");
-		x1 = restricted_pow(not_snd_ag_cob, g->alpha);
+		x1 = restricted_pow(not_snd_ag_cob, g->beta);
 		x2 = fst->not_cob*x1;
 	}
 	else
 	{
 		//printf("case 2 true\n");
-		x1 = restricted_pow(fst->not_cob, g->alpha);
+		x1 = restricted_pow(fst->not_cob, g->beta);
 		x2 = not_snd_ag_cob * x1;
 	}
 	return(1 - x2);
@@ -119,7 +119,7 @@ void logic_engine(t_channel **t, t_globals *g)
 {
 	int *inv;
 	t_channel *opt;
-	int total;
+	int  total;
 	int acc;
 	long double max;
 	long double max_snd;
@@ -129,22 +129,30 @@ void logic_engine(t_channel **t, t_globals *g)
 	int n_channels;
 	int i;
 	int j;
+	int k;
 	int sum;
 	time_t last_report = 0;
 	unsigned long long checked;
 	bool max_found;
 	bool contrast;
+	int round;
 
+	//display_channels(*t, g);
+	//exit(0);
 	n_channels = count_channels(*t);
-	total = 1000000; // this might be flexible, dynamic or user-defined?
-	acc = 10000;
+	total = g->budget; 
+	acc = total * g->acc;
+	while(total % acc != 0)
+		acc--;
+	//printf("%i %i\n", total, acc);
+	//exit(0);
 	inv = malloc(sizeof(int) * n_channels);
-	opt = NULL;
 	if(!inv)
 	{
 		perror("malloc error in logic engine\n");
 		exit(1);
 	}
+	opt = NULL;
 	i = 1;
 	inv[0] = total;
 	while(i < n_channels)
@@ -164,16 +172,16 @@ void logic_engine(t_channel **t, t_globals *g)
 	contrast = false;
 	while(1) // what is the exit condition? 
 	{	
-		i = 0;
+		k = 0;
 		tmp = *t;
 		while(tmp)
 		{
 			//if(inv[0] == 970000 && inv[1] == 10000 && inv[2] == 10000 && inv[3] == 10000)
 			//	contrast = true;
-			contrast = compute_cob(tmp,g,inv[i], contrast);
+			contrast = compute_cob(tmp,g,inv[k], contrast);
 			//printf("%f\n",tmp->cob);
 			tmp = tmp->next;
-			i++;
+			k++;
 		}
 		//display_channels(*t, NULL);
 		t_channel *sorted = copy_list(*t);
