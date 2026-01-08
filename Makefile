@@ -4,8 +4,8 @@ WINNAME     = optimizer.exe
 CC          = gcc
 WINCC       = x86_64-w64-mingw32-gcc
 
-CFLAGS      = -Wall -D BUFFER_SIZE=64 -I. -Ilibft
-LIBS        = -lm
+CFLAGS      = -Wall -D BUFFER_SIZE=64 -I. -Ilibft -I/usr/local/include
+LIBS        = -lm -lxlsxio_read -lminizip -lz -lexpat
 
 # Project sources
 SRC         = main.c \
@@ -24,6 +24,7 @@ SRC         = main.c \
 			  numeric.c \
 			  tokenizer_tsv.c \
 			  tokenizer_csv.c \
+			  parser_xlsx.c \
 
 OBJ         = $(SRC:.c=.o)
 

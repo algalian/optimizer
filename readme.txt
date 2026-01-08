@@ -8,7 +8,7 @@ EXTRACT;
 -move to XLSX
 
 TRANSFORM;
--
+-Round up optimally (right now it just increases granularity)
 
 
 LOAD;

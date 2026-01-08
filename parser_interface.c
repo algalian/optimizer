@@ -1,6 +1,7 @@
 #include "optimizer.h"
 
 
+
 void free_cells(char **cells, int count)
 {
     if (!cells) return;
@@ -56,6 +57,10 @@ int make_parser_for_file(const char *filename, t_parser *out)
         }
         if (!strcmp(dot, ".csv")) {
             use_csv_parser(out);
+            return 0;
+        }
+        if (!strcmp(dot, ".xlsx") || !strcmp(dot, ".xlsm")) {
+            use_xlsx_parser(out);
             return 0;
         }
     }
