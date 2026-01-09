@@ -41,7 +41,8 @@ int main(int argc, char **argv)
         "Channel",             
         "Corr Dupl",   
         "Universo 000",      
-        "0.00217",     //support ratios  
+        "0.00217",//support ratios  
+        "Simulador",       
         NULL
     };
 
@@ -56,7 +57,8 @@ int main(int argc, char **argv)
     }
     val = strtold(fields[7], &end);
     globals.acc = val;
-    //display_channels(channels, &globals);
+    printf("data loaded into channels list. Displaying:\n");
+    display_channels(channels, &globals);
     logic_engine(&channels, &globals);
     free_channels(channels);
     return EXIT_SUCCESS;

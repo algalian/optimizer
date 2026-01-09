@@ -21,8 +21,12 @@ static int xlsx_open(t_parser *p, const char *path)
     }
 
     /* Open the first worksheet */
-    ctx->sheet = xlsxioread_sheet_open(ctx->reader, NULL, XLSXIOREAD_SKIP_EMPTY_ROWS);
+    //printf("the sheet is %s\n", p->sheet_name);
+    ctx->sheet = xlsxioread_sheet_open(ctx->reader, p->sheet_name, XLSXIOREAD_SKIP_EMPTY_ROWS);
     if (!ctx->sheet) {
+        fprintf(stderr,
+        "Error: sheet '%s' not found\n",
+        p->sheet_name ? p->sheet_name : "(null)");
         xlsxioread_close(ctx->reader);
         free(ctx);
         return -1;

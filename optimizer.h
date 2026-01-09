@@ -137,7 +137,7 @@ typedef enum e_sniff_status {
 typedef struct s_parser {
     FILE *fp;
     char delimiter;
-
+    const char *sheet_name;
     int (*open)(struct s_parser *, const char *);
     t_parse_error (*read_header)(struct s_parser *, char ***, int *);
     t_parse_error (*read_row)(struct s_parser *, char ***, int *);

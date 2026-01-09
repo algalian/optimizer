@@ -61,8 +61,9 @@ int make_parser_for_file(const char *filename, t_parser *out)
         }
         if (!strcmp(dot, ".xlsx") || !strcmp(dot, ".xlsm")) 
         {
-           // printf("using xlsx parser\n");
+           //printf("using xlsx parser\n");
             use_xlsx_parser(out);
+            //printf("xlsx parser initialized\n");
             return 0;
         }
     }

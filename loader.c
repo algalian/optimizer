@@ -13,10 +13,17 @@ static int row_matches_header(char **row,int count, char **fields)
     int j;
 
     i = 0;
+    /*while(i < count)
+    {
+        printf("%s\n", row[i]);
+        i++;
+    }
+    printf("all cells are there\n");
+    exit(0);*/
     while(i < 3) //fix magic number
     {
         j = 0;
-        while(row[j])
+        while(j < count)
         {
             if(strcmp(row[j],fields[i]) == 0)
             {
@@ -152,19 +159,21 @@ int load_channels_from_file(const char *filepath, char **fields, t_channel **lis
 
 
     *list = NULL;
-
     if (make_parser_for_file(filepath, &p) != 0) {
         fprintf(stderr,
                 "Error: cannot determine file format for '%s'\n",
                 filepath);
         return -1;
     }
+    p.sheet_name = fields[8];
+    printf("the sheet is %s\n", p.sheet_name); //<-- this properly prints the name of the sheet
     if (p.open(&p, filepath) != 0) {
         fprintf(stderr,
                 "Error: cannot open '%s'\n",
                 filepath);
         return -1;
     }
+    printf("the file opened correctly\n");
 
     /* -------- FIND HEADER -------- */
 char **header = NULL;
@@ -181,9 +190,12 @@ printf("these above\n");*/
 j = 0;
 while (1) 
 {
+    //printf("proceeding to read row %i\n", j);
     err = p.read_row(&p, &header, &hcount);
+    //printf("%s %s %s %s %s\n", header[0], header[1], header[13], header[14], header[15]); 
     row_num++;
-    if (err == PARSE_EOF) {
+    if (err == PARSE_EOF) 
+    {
         fprintf(stderr,
                 "Error: header not found in '%s'\n",
                 filepath);
@@ -191,7 +203,8 @@ while (1)
         return -1;
     }
 
-    if (err != PARSE_OK) {
+    if (err != PARSE_OK) 
+    {
         fprintf(stderr,
                 "Error: parse failure before header (row %d)\n",
                 row_num);
@@ -208,7 +221,6 @@ while (1)
     // Try load Corr. Dupl //
     if (try_load_corr_dupl(header, hcount, g, &corr, row_num, fields[5]) < 0)
         goto fail;
-    
     if (row_matches_header(header, hcount, fields) == 1)
     {
         /*printf("we found 'em at %i\n", j);
@@ -257,13 +269,13 @@ while (1)
             goto fail;
         }
 
-        if (ccount != hcount) {
+        /*if (ccount != hcount) {
             fprintf(stderr,
                     "Error: column count mismatch at row %d "
                     "(expected %d, got %d)\n",
                     row_num, hcount, ccount);
             goto fail;
-        }
+        }*/
 
         t_channel *node = new_node();
         if (!node) {
