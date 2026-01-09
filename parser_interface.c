@@ -59,7 +59,9 @@ int make_parser_for_file(const char *filename, t_parser *out)
             use_csv_parser(out);
             return 0;
         }
-        if (!strcmp(dot, ".xlsx") || !strcmp(dot, ".xlsm")) {
+        if (!strcmp(dot, ".xlsx") || !strcmp(dot, ".xlsm")) 
+        {
+           // printf("using xlsx parser\n");
             use_xlsx_parser(out);
             return 0;
         }

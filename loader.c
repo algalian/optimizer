@@ -159,7 +159,6 @@ int load_channels_from_file(const char *filepath, char **fields, t_channel **lis
                 filepath);
         return -1;
     }
-
     if (p.open(&p, filepath) != 0) {
         fprintf(stderr,
                 "Error: cannot open '%s'\n",
@@ -184,7 +183,6 @@ while (1)
 {
     err = p.read_row(&p, &header, &hcount);
     row_num++;
-
     if (err == PARSE_EOF) {
         fprintf(stderr,
                 "Error: header not found in '%s'\n",
@@ -200,19 +198,17 @@ while (1)
         p.close(&p);
         return -1;
     }
-
-
-    /* Try load Universo */
+    // Try load Universo 
     int r = try_load_universe(header, hcount, g, row_num, fields[6]);
     if (r < 0)
         goto fail;
     int b = try_load_universe(header, hcount, g, row_num, "Presupuesto");
     if(b < 0 )
         goto fail;
-    /* Try load Corr. Dupl */
+    // Try load Corr. Dupl //
     if (try_load_corr_dupl(header, hcount, g, &corr, row_num, fields[5]) < 0)
         goto fail;
-
+    
     if (row_matches_header(header, hcount, fields) == 1)
     {
         /*printf("we found 'em at %i\n", j);
@@ -229,7 +225,7 @@ while (1)
     hcount = 0;
     j++;
 }
-
+//printf("rows found\n");
     /* -------- MAP COLUMNS -------- */
     t_colmap map;
     if (build_colmap(&map, header, hcount, fields) != 0) {

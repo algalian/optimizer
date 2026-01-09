@@ -6,6 +6,7 @@ EXTRACT;
 -Optional whitespace trimming
 -Add limits (max fields / line length)
 -move to XLSX
+    ->Isolate segfault.
 
 TRANSFORM;
 -Round up optimally (right now it just increases granularity)

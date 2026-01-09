@@ -47,6 +47,9 @@ static t_parse_error xlsx_read_header(t_parser *p,
 
 /* -------- read_row -------- */
 
+
+/* -------- close -------- */
+
 static t_parse_error xlsx_read_row(t_parser *p,
                                    char ***out_cells,
                                    int *out_count)
@@ -60,13 +63,38 @@ static t_parse_error xlsx_read_row(t_parser *p,
     if (!xlsxioread_sheet_next_row(ctx->sheet))
         return PARSE_EOF;
 
-    /* Row exists, but no cells yet */
-    *out_cells = NULL;
-    *out_count = 0;
-    return PARSE_OK;
-}
+    char **cells = NULL;
+    int count = 0;
 
-/* -------- close -------- */
+    char *value;
+
+    /* Read all cells in the row */
+    while ((value = xlsxioread_sheet_next_cell(ctx->sheet)) != NULL) {
+
+        char *cell = value ? strdup(value) : strdup("");
+        if (!cell)
+            goto alloc_fail;
+
+        char **tmp = realloc(cells, sizeof(char *) * (count + 1));
+        if (!tmp) {
+            free(cell);
+            goto alloc_fail;
+        }
+
+        cells = tmp;
+        cells[count++] = cell;
+    }
+
+    *out_cells = cells;
+    *out_count = count;
+    return PARSE_OK;
+
+alloc_fail:
+    for (int i = 0; i < count; i++)
+        free(cells[i]);
+    free(cells);
+    return PARSE_ALLOC_FAIL;
+}
 
 static void xlsx_close(t_parser *p)
 {
