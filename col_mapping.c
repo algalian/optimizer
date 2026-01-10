@@ -19,8 +19,14 @@ int build_colmap(t_colmap *map, char **header, int hcount, char **fields)
 
     //printf("%i %i %i %i %i\n", map->name, map->a, map->b, map->c, map->cpm);
     /* validate all are found */
-    for (int *p = (int *)map; p < (int *)(map + 1); p++)
-        if (*p < 0)
-            return -1;
+    if (map->name < 0 ||
+        map->a    < 0 ||
+        map->b    < 0 ||
+        map->c    < 0 ||
+        map->cpm  < 0)
+    {
+        return -1;
+    }
+
     return 0;
 }

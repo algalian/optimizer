@@ -1,8 +1,6 @@
 NAME        = optimizer
-WINNAME     = optimizer.exe
 
 CC          = gcc
-WINCC       = x86_64-w64-mingw32-gcc
 
 CFLAGS      = -Wall -D BUFFER_SIZE=64 -I. -Ilibft -I/usr/local/include
 LIBS        = -lm -lxlsxio_read -lminizip -lz -lexpat
@@ -58,11 +56,6 @@ libft/%.o: libft/%.c
 	@echo "$(YELLOW)Compiled libft: $<$(RESET)"
 
 
-# ---------- WINDOWS BUILD ----------
-
-win:
-	@$(WINCC) $(CFLAGS) $(SRC) $(LIBFT_SRC) $(LIBS) -o $(WINNAME)
-	@echo "$(GREEN)Windows executable built: $(WINNAME)$(RESET)"
 
 
 # ---------- CLEAN RULES ----------
@@ -78,4 +71,4 @@ fclean: clean
 re: fclean all
 
 
-.PHONY: all clean fclean re win
+.PHONY: all clean fclean re

@@ -192,6 +192,9 @@ while (1)
 {
     //printf("proceeding to read row %i\n", j);
     err = p.read_row(&p, &header, &hcount);
+    printf("Row %d:\n", row_num);
+    for (int i = 0; i < hcount; i++)
+    printf("  [%d] '%s'\n", i, header[i]);
     //printf("%s %s %s %s %s\n", header[0], header[1], header[13], header[14], header[15]); 
     row_num++;
     if (err == PARSE_EOF) 
