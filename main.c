@@ -20,6 +20,28 @@ int main(int argc, char **argv)
     /* --------------------------------------------------
     ** ARGUMENT VALIDATION
     ** -------------------------------------------------- */
+    
+    /*printf("START\n");
+    printf("argc = %d\n", argc);
+
+    for (int i = 0; i < argc; i++)
+        printf("argv[%d] = %s\n", i, argv[i]);
+
+    if (argc < 2) {
+        printf("No input file\n");
+        return 1;
+    }
+
+    FILE *f = fopen(argv[1], "rb");
+    if (!f) {
+        perror("fopen failed");
+        return 2;
+    }
+
+    printf("File opened OK\n");
+    fclose(f);*/
+
+    
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <input_file>\n", argv[0]);
         return EXIT_FAILURE;
