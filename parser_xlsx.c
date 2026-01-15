@@ -1,12 +1,22 @@
 #include "optimizer.h"
 #include <xlsxio_read.h>
+#include <xlsxio_write.h>
 
 typedef struct s_xlsx_ctx {
     xlsxioreader      reader;
     xlsxioreadersheet sheet;
 } t_xlsx_ctx;
 
-/* -------- open -------- */
+
+static int xlsx_write_cell(t_parser *p, int row, int col, const char *value)
+{
+    return 0;
+}
+
+static int xlsx_save(t_parser *p)
+{
+    return 0;
+}
 
 static int xlsx_open(t_parser *p, const char *path)
 {
@@ -128,4 +138,6 @@ void use_xlsx_parser(t_parser *p)
     p->read_header = xlsx_read_header;
     p->read_row = xlsx_read_row;
     p->close = xlsx_close;
+    p->write_cell = xlsx_write_cell;
+    p->save = xlsx_save;
 }

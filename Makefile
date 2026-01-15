@@ -5,11 +5,11 @@ WINFOLDER   = optimizer_windows
 CC          = gcc
 WINCC       = x86_64-w64-mingw32-gcc
 
-CFLAGS      = -Wall -D BUFFER_SIZE=64 -I. -Ilibft
-WINFLAGS    = -Wall -D BUFFER_SIZE=64 -I. -Ilibft -I/mingw64/include
+CFLAGS   = -Wall -D BUFFER_SIZE=64 -I. -Ilibft -I/usr/include
+WINFLAGS = -Wall -D BUFFER_SIZE=64 -I. -Ilibft -I/mingw64/include
 
-LIBS = -lm -lxlsxio_read -lz -lminizip -lexpat
-WINLIBS     = -L/mingw64/lib -lxlsxio_read -lz -lminizip -lexpat
+LIBS     = -lm -lxlsxio_read -lz -lminizip -lexpat -lxlsxwriter
+WINLIBS  = -L/mingw64/lib -lxlsxio_read -lz -lminizip -lexpat -lxlsxwriter
 
 SRC = main.c logic_engine.c sort.c lists.c loader.c \
       parser_csv.c parser_tsv.c parser_xlsx.c parser_interface.c \
@@ -59,6 +59,7 @@ win-dlls:
 	@cp /mingw64/bin/libgcc_s_seh-1.dll $(WINFOLDER)/
 	@cp /mingw64/bin/libstdc++-6.dll $(WINFOLDER)/
 	@cp /mingw64/bin/libwinpthread-1.dll $(WINFOLDER)/
+	@cp /mingw64/bin/libxlsxwriter.dll $(WINFOLDER)/
 	@echo "$(GREEN)All DLLs copied to $(WINFOLDER)$(RESET)"
 
 # ---------- CLEAN ----------

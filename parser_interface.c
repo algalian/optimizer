@@ -5,12 +5,14 @@
 static int dummy_write_cell(t_parser *p, int row, int col, const char *value)
 {
     (void)p; (void)row; (void)col; (void)value;
+    printf("dummy write enabled\n");
     return 0;
 }
 
 static int dummy_save(t_parser *p)
 {
     (void)p;
+    printf("dummy save enabled\n");
     return 0;
 }
 
