@@ -6,7 +6,6 @@ EXTRACT;
 -Optional whitespace trimming
 -Add limits (max fields / line length)
 -move to XLSX
-    ->Fix column mismatch
 
 TRANSFORM;
 -Round up optimally (right now it just increases granularity)

@@ -1,5 +1,6 @@
 NAME        = optimizer
 WINNAME     = optimizer.exe
+WINFOLDER   = optimizer_windows
 
 CC          = gcc
 WINCC       = x86_64-w64-mingw32-gcc
@@ -13,8 +14,7 @@ WINLIBS     = -L/mingw64/lib -lxlsxio_read -lz -lminizip -lexpat
 SRC = main.c logic_engine.c sort.c lists.c loader.c \
       parser_csv.c parser_tsv.c parser_xlsx.c parser_interface.c \
       record_reader.c tokenizer_csv.c tokenizer_tsv.c \
-      col_mapping.c col_schema.c numeric.c write_csv.c \
-      get_next_line.c read_csv_utils.c
+      col_mapping.c col_schema.c numeric.c write.c \
 
 OBJ = $(SRC:.c=.o)
 
@@ -35,36 +35,42 @@ $(NAME): $(OBJ) $(LIBFT_OBJ)
 	@echo "$(GREEN)Linux build complete: $(NAME)$(RESET)"
 
 %.o: %.c optimizer.h
+	@echo "$(YELLOW)$<$(RESET)"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 libft/%.o: libft/%.c
+	@echo "$(YELLOW)$<$(RESET)"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 # ---------- WINDOWS BUILD ----------
 
 win:
-	@$(WINCC) $(WINFLAGS) $(SRC) $(LIBFT_SRC) $(WINLIBS) -o $(WINNAME)
-	@echo "$(GREEN)Windows build complete: $(WINNAME)$(RESET)"
+	@mkdir -p $(WINFOLDER)
+	@$(WINCC) $(WINFLAGS) $(SRC) $(LIBFT_SRC) $(WINLIBS) -o $(WINFOLDER)/$(WINNAME)
+	@echo "$(GREEN)Windows build complete: $(WINFOLDER)/$(WINNAME)$(RESET)"
 	@mingw32-make win-dlls
 
 win-dlls:
-	@cp /mingw64/bin/libxlsxio_read.dll .
-	@cp /mingw64/bin/libminizip-*.dll .
-	@cp /mingw64/bin/zlib1.dll .
-	@cp /mingw64/bin/libexpat-1.dll .
-	@cp /mingw64/bin/libbz2-1.dll .
-	@cp /mingw64/bin/libgcc_s_seh-1.dll .
-	@cp /mingw64/bin/libstdc++-6.dll .
-	@cp /mingw64/bin/libwinpthread-1.dll .
-	@echo "$(GREEN)All DLLs copied$(RESET)"
+	@cp /mingw64/bin/libxlsxio_read.dll $(WINFOLDER)/
+	@cp /mingw64/bin/libminizip-*.dll $(WINFOLDER)/
+	@cp /mingw64/bin/zlib1.dll $(WINFOLDER)/
+	@cp /mingw64/bin/libexpat-1.dll $(WINFOLDER)/
+	@cp /mingw64/bin/libbz2-1.dll $(WINFOLDER)/
+	@cp /mingw64/bin/libgcc_s_seh-1.dll $(WINFOLDER)/
+	@cp /mingw64/bin/libstdc++-6.dll $(WINFOLDER)/
+	@cp /mingw64/bin/libwinpthread-1.dll $(WINFOLDER)/
+	@echo "$(GREEN)All DLLs copied to $(WINFOLDER)$(RESET)"
 
 # ---------- CLEAN ----------
 
 clean:
 	@rm -f $(OBJ) $(LIBFT_OBJ)
+	@rm -f *.dll
+	@rm -f $(WINNAME)
+	@rm -rf $(WINFOLDER)
 
 fclean: clean
-	@rm -f $(NAME) $(WINNAME) *.dll
+	@rm -f $(NAME)
 
 re: fclean all
 

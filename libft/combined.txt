@@ -1,0 +1,277 @@
+------------------
+ft_lstadd_back_bonus.c
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstadd_back_bonus.c                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: algalian <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/16 15:57:33 by algalian          #+#    #+#             */
+/*   Updated: 2023/02/16 15:57:38 by algalian         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"libft.h"
+
+void	ft_lstadd_back(t_list **lst, t_list *new)
+{
+	t_list	*tail;
+
+	if (lst)
+	{
+		if (*lst == NULL)
+		{
+			*lst = new;
+		}
+		else
+		{
+			tail = ft_lstlast(*lst);
+			tail->next = new;
+		}
+	}
+}
+
+------------------
+ft_lstadd_front_bonus.c
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstadd_front.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: algalian <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/14 21:23:52 by algalian          #+#    #+#             */
+/*   Updated: 2023/02/14 21:23:53 by algalian         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"libft.h"
+
+void	ft_lstadd_front(t_list **lst, t_list *new)
+{
+	new->next = *lst;
+	*lst = new;
+}
+
+------------------
+ft_lstclear_bonus.c
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstclear_bonus.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: algalian <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/16 15:59:57 by algalian          #+#    #+#             */
+/*   Updated: 2023/02/16 15:59:59 by algalian         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"libft.h"
+
+void	ft_lstclear(t_list **lst, void (*del)(void *))
+{
+	t_list	*clear;
+
+	if (lst)
+	{
+		while (*lst)
+		{
+			clear = (*lst)->next;
+			ft_lstdelone(*lst, del);
+			*lst = clear;
+		}
+	}
+}
+
+------------------
+ft_lstdelone_bonus.c
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstdelone_bonus.c                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: algalian <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/16 16:00:40 by algalian          #+#    #+#             */
+/*   Updated: 2023/02/16 16:00:41 by algalian         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"libft.h"
+
+void	ft_lstdelone(t_list *lst, void (*del)(void*))
+{
+	if (!lst)
+		return ;
+	if (del)
+	{
+		del (lst->content);
+		free (lst);
+	}
+}
+
+------------------
+ft_lstiter_bonus.c
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstiter_bonus.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: algalian <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/16 16:01:34 by algalian          #+#    #+#             */
+/*   Updated: 2023/02/16 16:01:35 by algalian         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"libft.h"
+
+void	ft_lstiter(t_list *lst, void (*f)(void *))
+{
+	while (lst)
+	{
+		f(lst->content);
+		lst = lst->next;
+	}
+}
+
+------------------
+ft_lstlast_bonus.c
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstlast_bonus.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: algalian <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/16 16:03:56 by algalian          #+#    #+#             */
+/*   Updated: 2023/02/16 16:03:57 by algalian         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"libft.h"
+
+t_list	*ft_lstlast(t_list *lst)
+{
+	t_list	*pointer;
+
+	if (ft_lstsize(lst) == 0)
+		return (NULL);
+	if (ft_lstsize(lst) == 1)
+		return (lst);
+	pointer = lst;
+	while (pointer->next != NULL)
+	{
+		pointer = pointer->next;
+	}
+	return (pointer);
+}
+
+------------------
+ft_lstmap_bonus.c
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstmap_bonus.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: algalian <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/16 16:05:01 by algalian          #+#    #+#             */
+/*   Updated: 2023/02/16 16:05:03 by algalian         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"libft.h"
+
+t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
+{
+	t_list	*head;
+	t_list	*new;
+
+	if (!f)
+		return (NULL);
+	head = NULL;
+	while (lst)
+	{
+		new = ft_lstnew(f(lst->content));
+		if (new == NULL)
+		{
+			ft_lstclear(&new, del);
+			return (NULL);
+		}
+		ft_lstadd_back(&head, new);
+		lst = lst->next;
+	}
+	return (head);
+}
+
+------------------
+ft_lstnew_bonus.c
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstnew.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: algalian <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/14 21:22:05 by algalian          #+#    #+#             */
+/*   Updated: 2023/02/14 21:22:10 by algalian         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"libft.h"
+
+t_list	*ft_lstnew(void *content)
+{
+	t_list	*new;
+
+	new = (t_list *) malloc(sizeof (*new));
+	if (new == NULL)
+		return (NULL);
+	new->content = content;
+	new->next = NULL;
+	return (new);
+}
+
+------------------
+ft_lstsize_bonus.c
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_lstsize_bonus.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: algalian <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/16 16:06:18 by algalian          #+#    #+#             */
+/*   Updated: 2023/02/16 16:06:20 by algalian         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"libft.h"
+
+int	ft_lstsize(t_list *lst)
+{
+	int		i;
+	t_list	*pointer;
+
+	pointer = lst;
+	i = 0;
+	while (pointer)
+	{
+		pointer = pointer->next;
+		i++;
+	}
+	return (i);
+}
+

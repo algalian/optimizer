@@ -92,7 +92,7 @@ typedef struct s_column_spec {
 } t_column_spec;
 
 void read_csv(char **args, t_channel **t, t_globals *g);
-void logic_engine(t_channel **t, t_globals *g);
+t_channel *logic_engine(t_channel **t, t_globals *g);
 char	*get_next_line(int fd);
 char	*ft_strjoin(char *s1, char *s2);
 char	*ft_strchr(const char *s, int c);
@@ -142,6 +142,8 @@ typedef struct s_parser {
     t_parse_error (*read_header)(struct s_parser *, char ***, int *);
     t_parse_error (*read_row)(struct s_parser *, char ***, int *);
     void (*close)(struct s_parser *);
+    int (*write_cell)(struct s_parser *, int row, int col, const char *value);
+    int (*save)(struct s_parser *);
 } t_parser;
 
 typedef struct s_corr_state {
@@ -172,20 +174,22 @@ t_sniff_status sniff_delimiter(const char *path, char *out_delim);
 void use_csv_parser(t_parser *p);
 void use_tsv_parser(t_parser *p);
 
-int load_channels_from_file(const char *filepath,
-                            char **unused,
-                            t_channel **list, t_globals *g);
+int load_channels_from_file(const char *filepath, char **fields, t_channel **list, t_globals *g, t_parser *p, t_colmap *map, int *row_num);
+
 
 void free_cells(char **cells, int count);
 
 int parse_long_double(const char *s,
                       long double *out,
-                      int row,
                       const char *col_name);
-
 
 
 void use_xlsx_parser(t_parser *p);
 
+
+
+//-----------------write module
+
+int write_in_file(const char *filename, t_channel *opt, t_globals *g, t_parser *p, t_colmap *map, int row_number);
 
 #endif

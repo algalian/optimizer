@@ -115,7 +115,7 @@ static double aggregated_cob(t_channel *t, t_globals *g, long double snd_ag_cob)
 
 
 
-void logic_engine(t_channel **t, t_globals *g)
+t_channel *logic_engine(t_channel **t, t_globals *g)
 {
 	int *inv;
 	t_channel *opt;
@@ -221,7 +221,7 @@ void logic_engine(t_channel **t, t_globals *g)
 		time_t now = time(NULL);
 		if (now - last_report >= 1) 
 		{
-			printf("%llu combinations checked. Current: %i, %i, %i, %i. Cob = %Lf\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
+			printf("%llu combinations checked. Current vector of inv: %i, %i, %i, %i. Cob = %Lf\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
 			fflush(stdout);
 			last_report = now;
 			max_found = false;
@@ -249,7 +249,8 @@ void logic_engine(t_channel **t, t_globals *g)
 	//merge_sort(t, cmp_notcob_asc);
 	//display_channels(*t, NULL);
 	//exit(0);
-	printf("found it!!!  coberture = %Lf, 2nd tier = %LF\n", max, max_snd);
-	display_channels(opt, g);
+	printf("found it!!!  coberture = %Lf, 2nd tier = %LF\ntotal number of combinations checked: %lld\n", max, max_snd, checked);
+	//display_channels(opt, g);
+	return(opt);
 	free(inv);
 }

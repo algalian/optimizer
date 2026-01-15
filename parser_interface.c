@@ -2,6 +2,18 @@
 
 
 
+static int dummy_write_cell(t_parser *p, int row, int col, const char *value)
+{
+    (void)p; (void)row; (void)col; (void)value;
+    return 0;
+}
+
+static int dummy_save(t_parser *p)
+{
+    (void)p;
+    return 0;
+}
+
 void free_cells(char **cells, int count)
 {
     if (!cells) return;
@@ -78,6 +90,8 @@ int make_parser_for_file(const char *filename, t_parser *out)
         use_csv_parser(out);
 
     out->delimiter = d;
+    out->write_cell = dummy_write_cell;
+    out->save = dummy_save;
     return 0;
 }
 

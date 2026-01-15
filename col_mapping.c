@@ -16,6 +16,7 @@ int build_colmap(t_colmap *map, char **header, int hcount, char **fields)
     map->b       = find_col(header, hcount, fields[1]);
     map->c       = find_col(header, hcount, fields[2]);
     map->cpm     = find_col(header, hcount, fields[3]);
+    map->inv     = find_col(header, hcount, "Inversión");
 
     //printf("%i %i %i %i %i\n", map->name, map->a, map->b, map->c, map->cpm);
     /* validate all are found */
@@ -23,7 +24,8 @@ int build_colmap(t_colmap *map, char **header, int hcount, char **fields)
         map->a    < 0 ||
         map->b    < 0 ||
         map->c    < 0 ||
-        map->cpm  < 0)
+        map->cpm  < 0 ||
+        map->inv < 0)
     {
         return -1;
     }

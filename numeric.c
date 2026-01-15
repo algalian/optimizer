@@ -5,7 +5,6 @@
 
 int parse_long_double(const char *s,
                       long double *out,
-                      int row,
                       const char *col_name)
 {
     char *end;
@@ -13,8 +12,8 @@ int parse_long_double(const char *s,
 
     if (!s || *s == '\0') {
         fprintf(stderr,
-                "Error: empty numeric field at row %d (column '%s')\n",
-                row, col_name);
+                "Error: empty numeric field (column '%s')\n",
+                 col_name);
         return -1;
     }
 
@@ -23,15 +22,15 @@ int parse_long_double(const char *s,
 
     if (errno == ERANGE) {
         fprintf(stderr,
-                "Error: numeric overflow at row %d (column '%s')\n",
-                row, col_name);
+                "Error: numeric overflow  (column '%s')\n",
+                 col_name);
         return -1;
     }
 
     if (end == s) {
         fprintf(stderr,
-                "Error: invalid numeric value '%s' at row %d (column '%s')\n",
-                s, row, col_name);
+                "Error: invalid numeric value '%s'  (column '%s')\n",
+                s,  col_name);
         return -1;
     }
 
@@ -41,8 +40,8 @@ int parse_long_double(const char *s,
 
     if (*end != '\0') {
         fprintf(stderr,
-                "Error: trailing garbage '%s' at row %d (column '%s')\n",
-                end, row, col_name);
+                "Error: trailing garbage '%s'  (column '%s')\n",
+                end,  col_name);
         return -1;
     }
 
