@@ -154,7 +154,7 @@ int load_channels_from_file(const char *filepath, char **fields, t_channel **lis
 				filepath);
 		return -1;
 	}
-	p->sheet_name = fields[8];
+	p->sheet_name = fields[7];
 	//printf("the sheet is %s\n", p.sheet_name); //<-- this properly prints the name of the sheet
 	if (p->open(p, filepath) != 0) 
 	{

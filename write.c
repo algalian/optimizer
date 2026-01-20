@@ -19,6 +19,10 @@ int write_in_file(const char *filename, t_channel *opt, t_globals *g, t_parser *
 		i++;
 		current = current->next;
 	}
+	worksheet_write_string(sheet, 0, 2, "Número de combinaciones", NULL);
+	worksheet_write_number(sheet, 1, 2, g->iterations, NULL);
+	worksheet_write_string(sheet, 0, 3, "Cobertura", NULL);
+	worksheet_write_number(sheet, 1, 3, g->max_cob, NULL);
 	workbook_close(workbook);
 	return(0);
 }

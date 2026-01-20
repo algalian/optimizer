@@ -249,8 +249,10 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 	//merge_sort(t, cmp_notcob_asc);
 	//display_channels(*t, NULL);
 	//exit(0);
-	printf("found it!!!  coberture = %Lf, 2nd tier = %LF\ntotal number of combinations checked: %lld\n", max, max_snd, checked);
-	//display_channels(opt, g);
+	g->iterations = checked;
+	g->max_cob = max;
+	printf("found it!!!  coberture = %Lf, 2nd tier = %LF\ntotal number of combinations checked: %lld\n", g->max_cob, max_snd, g->iterations);
+	display_channels(opt, g);
+	//free(inv);
 	return(opt);
-	free(inv);
 }

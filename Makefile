@@ -67,8 +67,8 @@ win-dlls:
 clean:
 	@rm -f $(OBJ) $(LIBFT_OBJ)
 	@rm -f *.dll
-	@rm -f $(WINNAME)
-	@rm -rf $(WINFOLDER)
+	@rm -f $(WINFOLDER)/$(WINNAME)
+	@rm -f $(WINFOLDER)/*.dll
 
 fclean: clean
 	@rm -f $(NAME)
