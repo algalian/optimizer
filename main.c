@@ -166,11 +166,7 @@ static void welcome_prompt(char ***fields, char **defaults, char *help, char *in
 }
 
 
-static long double parse_granularity(char *s, t_globals *globals)
-{
-	globals->acc = 0.01;
-	return(0);
-}
+
 
 int main(int argc, char **argv)
 {
@@ -182,6 +178,8 @@ int main(int argc, char **argv)
 	t_parser p;
 	t_colmap map;
 	char **fields;
+	char *end;
+	long double val;
 	char *defaults[] =
 	{        
 		"A",             
@@ -214,11 +212,13 @@ int main(int argc, char **argv)
 	}
 	if(argc == 3)
 	{
-		if(parse_granularity(argv[2],&globals) != 0) 
+		val = strtold(argv[2], &end);
+		globals.acc = val;
+		/*if(parse_granularity(argv[2],&globals) != 0) 
 		{
 			printf("Granularity error. Usage examples:\n1%%\n0.01\n1/100\n");
 			return(1);
-		}
+		}*/
 	}
 	else
 	{
