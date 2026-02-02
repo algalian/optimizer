@@ -283,7 +283,9 @@ while (1)
 			parse_long_double(cells[map->c], &node->c,
 							    fields[2]) != 0 ||
 			parse_long_double(cells[map->cpm], &node->cpm,
-							    fields[3]) != 0) 
+							    fields[3]) != 0 ||
+			parse_long_double(cells[map->min], &node->min,
+								fields[8]) != 0)
 		{
 			free(node->name);
 			free(node);

@@ -41,6 +41,7 @@ typedef struct channel
     long double cob;
     long double not_cob;
     int inv;
+    long double min;
     struct channel *next;
 } t_channel;
 
@@ -53,7 +54,7 @@ typedef struct s_colmap {
     int n;
     int cob;
     int not_cob;
-    int inv;
+    int min;
     // add new fields here if struct grows
 } t_colmap;
 typedef struct globals

@@ -20,14 +20,14 @@ void display_channels(const t_channel *head, const t_globals *g)
 	int index = 0;
 	while (tmp) 
 	{
-		printf(" Channel %s, a = %Lf, b = %Lf, c = %Lf, cpm = %Lf, Nº = %i, coberture = %Lf, inv = %i, not_cob %Lf\n",
+		printf(" Channel %s, a = %Lf, b = %Lf, c = %Lf, cpm = %Lf, Nº = %i, coberture = %Lf, inv = %i, not_cob %Lf, min = %LF\n",
 		tmp->name,
 		tmp->a,
 		tmp->b,
 		tmp->c,
 		tmp->cpm,
 		tmp->n,
-		tmp->cob, tmp->inv, tmp->not_cob);
+		tmp->cob, tmp->inv, tmp->not_cob, tmp->min);
 		tmp = tmp->next;
 		index++;
 	}

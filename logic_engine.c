@@ -136,12 +136,14 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 	bool max_found;
 	bool contrast;
 	int round;
+	int sum_mins;
 
 	//display_channels(*t, g);
 	//exit(0);
 	n_channels = count_channels(*t);
 	total = g->budget; 
 	acc = total * g->acc;
+	//acc = 1;
 	while(total % acc != 0)
 		acc--;
 	//printf("%i %i\n", total, acc);
@@ -153,11 +155,21 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		exit(1);
 	}
 	opt = NULL;
+	tmp = *t;
+	sum_mins = 0;
+	while(tmp)
+	{
+		sum_mins += tmp->min;
+		tmp = tmp->next;
+	}
 	i = 1;
-	inv[0] = total;
+	inv[0] = total - sum_mins;
+	tmp = *t;
+	tmp = tmp->next;
 	while(i < n_channels)
 	{
-		inv[i] = 0;
+		inv[i] = tmp->min;
+		tmp = tmp->next;
 		i++;
 	}
 	/*i = 0;
@@ -219,9 +231,16 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		//display_channels(*t, g);
 		//printf("%f\n", ag_cob);
 		time_t now = time(NULL);
-		if (now - last_report >= 1) 
+		if (now - last_report >=1) 
 		{
-			printf("%llu combinations checked. Current vector of inv: %i, %i, %i, %i. Cob = %Lf\n", checked, inv[0], inv[1], inv[2], inv[3], ag_cob);
+			printf("%llu combinations checked. Current vector of inv: ", checked);
+			int n = 0;
+			while(n < n_channels)
+			{
+				printf("%i, ",inv[n]);
+				n++;
+			}
+			printf("cob = %Lf\n", ag_cob);
 			fflush(stdout);
 			last_report = now;
 			max_found = false;
@@ -233,23 +252,43 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		}
 		if(i < 0)
 			break;
-		inv[i] = inv[i] - acc;
+		tmp = *t;
+		while(tmp->n != i + 1)
+		{
+			tmp = tmp->next;
+		}
+		if(inv[i] - acc >= tmp->min)
+			inv[i] = inv[i] - acc;
+		else
+		{
+			checked++;
+			continue;
+		}		
 		sum = 0;
 		j = i + 1;
+		tmp = tmp->next;
 		while(j < n_channels)
 		{
-			sum += inv[j];
-			inv[j] = 0;
+			sum += inv[j] - tmp->min;
+			inv[j] = tmp->min;
+			tmp = tmp->next;
 			j++;
 		}
 		if (i + 1 < n_channels)
-			inv[i+1] = sum + acc;
+		{
+			tmp = *t;
+			while(tmp->n != i + 2)
+			{	
+				tmp = tmp->next;
+			}	
+			inv[i+1] = sum + acc + tmp->min;
+		}
 		checked++;
 	}
 	//merge_sort(t, cmp_notcob_asc);
 	//display_channels(*t, NULL);
 	//exit(0);
-	g->iterations = checked;
+	g->iterations = checked + 1;
 	g->max_cob = max;
 	printf("found it!!!  coberture = %Lf, 2nd tier = %LF\ntotal number of combinations checked: %lld\n", g->max_cob, max_snd, g->iterations);
 	display_channels(opt, g);
