@@ -275,7 +275,6 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		/* If none found, we are done */
 		if(i < 0)
 			break;
-
         /* Take one dollar from a[i] */
 		tmp = *t;
 		while(tmp->n != i + 1)
@@ -290,7 +289,6 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			checked++;
 			continue;
 		}
-
 		/* Collect all dollars to the right */
 		sum = 0;
 		j = i + 1;
@@ -302,8 +300,6 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			tmp = tmp->next;
 			j++;
 		}
-
-		
         /* Give collected dollars + 1 to a[i+1] */
 		if (i + 1 < n_channels)
 		{
