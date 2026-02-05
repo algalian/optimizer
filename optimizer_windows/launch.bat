@@ -1,3 +1,4 @@
 @echo off
-optimizer.exe
-pause
+echo Launcher started
+start "" "optimizer.exe"
+exit
