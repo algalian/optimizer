@@ -163,8 +163,8 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		tmp = tmp->next;
 	}
 	i = 1;
-	inv[0] = total - sum_mins;
 	tmp = *t;
+	inv[0] = total - sum_mins + tmp->min;
 	tmp = tmp->next;
 	while(i < n_channels)
 	{
@@ -173,16 +173,18 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		i++;
 	}
 	/*i = 0;
-	while(inv[i])
+	while(i < n_channels)
 	{
 		printf("%i\n", inv[i]);
 		i++;
 	}*/
+	//exit(0);
 	i = 0;
 	max = 0;
 	checked = 0;
 	contrast = false;
-	while(1) // what is the exit condition? 
+	while(1)
+	//while(checked < 30) 
 	{	
 		k = 0;
 		tmp = *t;
@@ -231,6 +233,7 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		//display_channels(*t, g);
 		//printf("%f\n", ag_cob);
 		time_t now = time(NULL);
+		//if(1)
 		if (now - last_report >=1) 
 		{
 			printf("%llu combinations checked. Current vector of inv: ", checked);
@@ -245,13 +248,27 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			last_report = now;
 			max_found = false;
 		}
+		/* Find rightmost i < N-1 with a[i] > 0 */
 		i = n_channels - 2;
-		while(i >= 0 && inv[i] == 0)
+		int min = 0;
+		while(i >= 0 && (inv[i] == 0 || inv[i] < min + acc))
 		{
 			i--;
+			int c = 0;
+			tmp = *t;
+			while(c < i)
+			{
+				tmp = tmp->next;
+				c++;
+			}
+			min = tmp->min;
 		}
+		//printf("rightmost channel is %i\n", tmp->n);
+		/* If none found, we are done */
 		if(i < 0)
 			break;
+
+        /* Take one dollar from a[i] */
 		tmp = *t;
 		while(tmp->n != i + 1)
 		{
@@ -263,7 +280,9 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		{
 			checked++;
 			continue;
-		}		
+		}
+
+		/* Collect all dollars to the right */
 		sum = 0;
 		j = i + 1;
 		tmp = tmp->next;
@@ -274,6 +293,9 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			tmp = tmp->next;
 			j++;
 		}
+
+		
+        /* Give collected dollars + 1 to a[i+1] */
 		if (i + 1 < n_channels)
 		{
 			tmp = *t;

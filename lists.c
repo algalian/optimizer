@@ -75,6 +75,7 @@ t_channel *copy_list(const t_channel *src)
 		n->n = src->n;
 		n->name = src->name;
 		n->not_cob = src->not_cob;
+		n->min = src->min;
         n->next = NULL;
         if (!head) 
 		{
