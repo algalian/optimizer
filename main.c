@@ -236,7 +236,7 @@ int main(int argc, char **argv)
         free_channels(channels);
         return EXIT_FAILURE;
     }
-	display_channels(channels,&globals);
+	//display_channels(channels,&globals);
     opt = logic_engine(&channels, &globals);
     if (write_in_file(input_path, opt, &globals, &p, &map, row_number) != 0)
     {

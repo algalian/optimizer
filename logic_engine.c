@@ -250,9 +250,17 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		}
 		/* Find rightmost i < N-1 with a[i] > 0 */
 		i = n_channels - 2;
-		int min = 0;
+		//printf("before rightmost find: %i\n", i);
+		tmp = *t;
+		while(tmp->n < n_channels - 1)
+		{
+			tmp = tmp->next;			
+		}
+		//printf("%i\n",tmp->n);
+		int min = tmp->min;
 		while(i >= 0 && (inv[i] == 0 || inv[i] < min + acc))
 		{
+			//printf("does it even enter the loop??\n");
 			i--;
 			int c = 0;
 			tmp = *t;
@@ -263,7 +271,7 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			}
 			min = tmp->min;
 		}
-		//printf("rightmost channel is %i\n", tmp->n);
+		//printf("after rightmost find: %i\n", i);
 		/* If none found, we are done */
 		if(i < 0)
 			break;
@@ -274,6 +282,7 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		{
 			tmp = tmp->next;
 		}
+		//printf("channel n is %i\n", tmp->n);
 		if(inv[i] - acc >= tmp->min)
 			inv[i] = inv[i] - acc;
 		else
