@@ -185,7 +185,7 @@ int main(int argc, char **argv)
 		"A",             
 		"B",             
 		"C",             
-		"CPM Compra",
+		"CPM Target",
 		"Channel",             
 		"Corr Dupl",   
 		"Universo 000",      

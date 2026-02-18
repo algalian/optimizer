@@ -67,7 +67,8 @@ typedef struct globals
     int has_corr_dupl;
     int has_budget;
     unsigned long long iterations;
-    long double max_cob;
+    long double max;
+    long double max_snd;
 } t_globals;
 
 typedef struct s_ratio
