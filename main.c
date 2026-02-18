@@ -171,18 +171,6 @@ static void welcome_prompt(char ***fields, char **defaults,
 
 int main(int argc, char **argv)
 {
-<<<<<<< HEAD
-    char input_path[2048] = {0};
-    char **fields = NULL;
-    t_channel  *channels = NULL;
-    t_channel  *opt = NULL;
-    t_globals   globals = {0};
-    int row_number = 0;
-    t_parser p;
-    t_colmap map;
-    char *end;
-    long double val;
-=======
 	char input_path[2048];
 	t_channel  *channels = NULL;
 	t_channel  *opt = NULL;
@@ -205,21 +193,6 @@ int main(int argc, char **argv)
 		"Simulador", 
 		NULL
 	};
->>>>>>> main
-
-    char *defaults[] = {
-        "A",
-        "B",
-        "C",
-        "CPM Compra",
-        "Channel",
-        "Corr Dupl",
-        "Universo 000",
-        "Simulador",
-        "Inversión",
-        NULL
-    };
-
     if (argc > 3)
     {
         printf("Prompt error. Wrong number of args\n");

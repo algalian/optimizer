@@ -287,7 +287,7 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			inv[i] = inv[i] - acc;
 		else
 		{
-			checked++;
+			g->iterations++;
 			continue;
 		}
 		/* Collect all dollars to the right */

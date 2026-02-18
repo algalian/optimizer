@@ -30,13 +30,10 @@ void display_channels(const t_channel *head, const t_globals *g)
 		tmp->c,
 		tmp->cpm,
 		tmp->n,
-<<<<<<< HEAD
-		tmp->cob, tmp->inv, tmp->not_cob, tmp->min);
-=======
 		tmp->cob, 
 		tmp->inv, 
-		tmp->not_cob);
->>>>>>> main
+		tmp->not_cob,
+		tmp->min);
 		tmp = tmp->next;
 		index++;
 	}
