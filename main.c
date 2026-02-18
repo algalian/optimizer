@@ -171,6 +171,7 @@ static void welcome_prompt(char ***fields, char **defaults,
 
 int main(int argc, char **argv)
 {
+<<<<<<< HEAD
     char input_path[2048] = {0};
     char **fields = NULL;
     t_channel  *channels = NULL;
@@ -181,6 +182,30 @@ int main(int argc, char **argv)
     t_colmap map;
     char *end;
     long double val;
+=======
+	char input_path[2048];
+	t_channel  *channels = NULL;
+	t_channel  *opt = NULL;
+	t_globals   globals = {0};
+	int row_number;
+	t_parser p;
+	t_colmap map;
+	char **fields;
+	char *end;
+	long double val;
+	char *defaults[] =
+	{        
+		"A",             
+		"B",             
+		"C",             
+		"CPM Target",
+		"Channel",             
+		"Corr Dupl",   
+		"Universo 000",      
+		"Simulador", 
+		NULL
+	};
+>>>>>>> main
 
     char *defaults[] = {
         "A",

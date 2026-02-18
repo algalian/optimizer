@@ -68,7 +68,10 @@ static double second_tier_aggregated_cob(t_channel *t, t_globals *g)
 	long double value;
 	
 	if(t != NULL)
-		snd = t->next;
+	{
+		snd = t;
+		snd = snd->next;
+	}
 	else
 		snd = NULL;
 	//display_channels(snd, g);
@@ -97,7 +100,7 @@ static double aggregated_cob(t_channel *t, t_globals *g, long double snd_ag_cob)
 
 
 	not_snd_ag_cob = 1 - snd_ag_cob;
-	fst = t;
+	fst = t; 
 	if(fst->not_cob <  not_snd_ag_cob)
 	{
 		//printf("case 1 true\n");
@@ -121,8 +124,6 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 	t_channel *opt;
 	int  total;
 	int acc;
-	long double max;
-	long double max_snd;
 	long double snd_ag_cob;
 	long double ag_cob;
 	t_channel *tmp;
@@ -132,7 +133,6 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 	int k;
 	int sum;
 	time_t last_report = 0;
-	unsigned long long checked;
 	bool max_found;
 	bool contrast;
 	int round;
@@ -180,17 +180,17 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 	}*/
 	//exit(0);
 	i = 0;
-	max = 0;
-	checked = 0;
+	g->max = 0;
+	g->iterations = 0;
 	contrast = false;
-	while(1)
-	//while(checked < 30) 
+    //while(g->iterations < 1000)
+	while(1) // what is the exit condition? 
 	{	
 		k = 0;
 		tmp = *t;
 		while(tmp)
 		{
-			//if(inv[0] == 970000 && inv[1] == 10000 && inv[2] == 10000 && inv[3] == 10000)
+			//if(inv[0] == 0 && inv[1] == 1200000 && inv[2] == 0 && inv[3] == 0)
 			//	contrast = true;
 			contrast = compute_cob(tmp,g,inv[k], contrast);
 			//printf("%f\n",tmp->cob);
@@ -201,16 +201,22 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		t_channel *sorted = copy_list(*t);
 		merge_sort(&sorted, cmp_notcob_asc);
 		snd_ag_cob = second_tier_aggregated_cob(sorted, g);
-		free_list(sorted);
 		//printf("snd tier ag cob: %f\n",snd_ag_cob);
-		ag_cob = aggregated_cob(*t,g,snd_ag_cob);
+		//display_channels(sorted, g);
+		ag_cob = aggregated_cob(sorted,g,snd_ag_cob);
+		free_list(sorted);
+		/*if(inv[0] == 443750 && inv[1] == 525000 && inv[2] == 231250 && inv[3] == 0)
+		{
+			display_channels(*t, g);
+			printf("with cob %LF 2nd: %LF\n", ag_cob, snd_ag_cob);
+		}*/
 		//merge_sort(t, cmp_n_asc);
 		//printf("ag cob: %f\n", ag_cob);
 		//display_channels(*t,NULL);
-		if(ag_cob >= max)
+		if(ag_cob >= g->max)
 		{	
-			max = ag_cob;
-			max_snd = snd_ag_cob;
+			g->max = ag_cob;
+			g->max_snd = snd_ag_cob;
 			free_list(opt);
 			opt = copy_list(*t);
 			if(!opt)
@@ -219,8 +225,8 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 				exit(1);
 			}
 			max_found = true;
-			//display_channels(opt, NULL);
-			//printf("with cob: %Lf snd: %LF\n ", max, max_snd);
+			//display_channels(opt, g);
+			//printf("with cob: %Lf snd: %LF\n ", g->max, g->max_snd);
 			/*i = 0;
 			while(i < n_channels)
 			{
@@ -234,16 +240,11 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		//printf("%f\n", ag_cob);
 		time_t now = time(NULL);
 		//if(1)
-		if (now - last_report >=1) 
+		//if(max_found == true)
+		if (now - last_report >= 1) 
 		{
-			printf("%llu combinations checked. Current vector of inv: ", checked);
-			int n = 0;
-			while(n < n_channels)
-			{
-				printf("%i, ",inv[n]);
-				n++;
-			}
-			printf("cob = %Lf\n", ag_cob);
+			//display_channels(opt, g);
+			printf("%llu combinations checked. Current vector of inv: %i, %i, %i, %i. Cob = %Lf\n", g->iterations, inv[0], inv[1], inv[2], inv[3], ag_cob);
 			fflush(stdout);
 			last_report = now;
 			max_found = false;
@@ -302,23 +303,14 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		}
         /* Give collected dollars + 1 to a[i+1] */
 		if (i + 1 < n_channels)
-		{
-			tmp = *t;
-			while(tmp->n != i + 2)
-			{	
-				tmp = tmp->next;
-			}	
-			inv[i+1] = sum + acc + tmp->min;
-		}
-		checked++;
+			inv[i+1] = sum + acc;
+		g->iterations++;
 	}
 	//merge_sort(t, cmp_notcob_asc);
 	//display_channels(*t, NULL);
 	//exit(0);
-	g->iterations = checked + 1;
-	g->max_cob = max;
-	printf("found it!!!  coberture = %Lf, 2nd tier = %LF\ntotal number of combinations checked: %lld\n", g->max_cob, max_snd, g->iterations);
+	printf("found it!!!  coberture = %Lf, 2nd tier = %LF\ntotal number of combinations checked: %lld\n", g->max, g->max_snd, g->iterations);
 	display_channels(opt, g);
-	//free(inv);
+	free(inv);
 	return(opt);
 }
