@@ -4,16 +4,13 @@ void display_channels(const t_channel *head, const t_globals *g)
 {
 	if(g)
 	{
-		int acc;
-		acc = g->budget * g->acc;
-		while((int)g->budget % acc != 0)
-			acc--;
+
 		printf("Globals:\n");
 		printf("  alpha       : %Lf\n", g->alpha);
 		printf("  beta        : %Lf\n", g->beta);
 		printf("  universe    : %Lf\n", g->universe);
-		printf("  budget      : %LF\n", g->budget);
-		printf("  granularity : %d\n", acc);
+		printf("  budget      : %Lf\n", g->budget);
+		printf("  granularity : %i\n", g->grn);
 		printf("  iterations  : %lld\n", g->iterations);
 		printf("  max         : %Lf\n", g->max);
 		printf("  max_snd     : %Lf\n", g->max_snd);

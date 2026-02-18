@@ -122,8 +122,6 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 {
 	int *inv;
 	t_channel *opt;
-	int  total;
-	int acc;
 	long double snd_ag_cob;
 	long double ag_cob;
 	t_channel *tmp;
@@ -137,16 +135,23 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 	bool contrast;
 	int round;
 	int sum_mins;
+	int total; 
+	int acc;
+
 
 	//display_channels(*t, g);
-	//exit(0);
-	n_channels = count_channels(*t);
+	n_channels = count_channels(*t); 
 	total = g->budget; 
 	acc = total * g->acc;
-	//acc = 1;
-	while(total % acc != 0)
-		acc--;
-	//printf("%i %i\n", total, acc);
+	if(acc != 0)
+	{
+		while(total % acc != 0)
+			acc--;
+		g->grn = acc;
+	}
+	else
+		g->grn = 1;
+	//display_channels(*t, g);
 	//exit(0);
 	inv = malloc(sizeof(int) * n_channels);
 	if(!inv)
@@ -156,15 +161,34 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 	}
 	opt = NULL;
 	tmp = *t;
+	//display_channels(*t, g);
+	while(tmp)
+	{
+		while((int) tmp->min % (int) g->grn != 0)
+		{
+			tmp->min++;
+		}
+		tmp = tmp->next;
+	}
+	//display_channels(*t, g);
+	//exit(0);
+	tmp = *t;
 	sum_mins = 0;
 	while(tmp)
 	{
 		sum_mins += tmp->min;
 		tmp = tmp->next;
 	}
+	if(sum_mins >= g->budget)
+	{
+		printf("incompatible solution\n");
+		free(inv);
+		free_channels(*t);
+		exit(0);
+	}
 	i = 1;
 	tmp = *t;
-	inv[0] = total - sum_mins + tmp->min;
+	inv[0] = g->budget - sum_mins + tmp->min;
 	tmp = tmp->next;
 	while(i < n_channels)
 	{
@@ -172,13 +196,6 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		tmp = tmp->next;
 		i++;
 	}
-	/*i = 0;
-	while(i < n_channels)
-	{
-		printf("%i\n", inv[i]);
-		i++;
-	}*/
-	//exit(0);
 	i = 0;
 	g->max = 0;
 	g->iterations = 0;
@@ -190,29 +207,15 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		tmp = *t;
 		while(tmp)
 		{
-			//if(inv[0] == 0 && inv[1] == 1200000 && inv[2] == 0 && inv[3] == 0)
-			//	contrast = true;
 			contrast = compute_cob(tmp,g,inv[k], contrast);
-			//printf("%f\n",tmp->cob);
 			tmp = tmp->next;
 			k++;
 		}
-		//display_channels(*t, NULL);
 		t_channel *sorted = copy_list(*t);
 		merge_sort(&sorted, cmp_notcob_asc);
 		snd_ag_cob = second_tier_aggregated_cob(sorted, g);
-		//printf("snd tier ag cob: %f\n",snd_ag_cob);
-		//display_channels(sorted, g);
 		ag_cob = aggregated_cob(sorted,g,snd_ag_cob);
 		free_list(sorted);
-		/*if(inv[0] == 443750 && inv[1] == 525000 && inv[2] == 231250 && inv[3] == 0)
-		{
-			display_channels(*t, g);
-			printf("with cob %LF 2nd: %LF\n", ag_cob, snd_ag_cob);
-		}*/
-		//merge_sort(t, cmp_n_asc);
-		//printf("ag cob: %f\n", ag_cob);
-		//display_channels(*t,NULL);
 		if(ag_cob >= g->max)
 		{	
 			g->max = ag_cob;
@@ -225,43 +228,31 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 				exit(1);
 			}
 			max_found = true;
-			//display_channels(opt, g);
-			//printf("with cob: %Lf snd: %LF\n ", g->max, g->max_snd);
-			/*i = 0;
-			while(i < n_channels)
-			{
-				printf("%i,", inv[i]);
-				i++;
-			}
-			printf("\n");
-			//printf("new max is %f\n", max);*/
+
 		}
-		//display_channels(*t, g);
-		//printf("%f\n", ag_cob);
 		time_t now = time(NULL);
 		//if(1)
 		//if(max_found == true)
 		if (now - last_report >= 1) 
 		{
-			//display_channels(opt, g);
 			printf("%llu combinations checked. Current vector of inv: %i, %i, %i, %i. Cob = %Lf\n", g->iterations, inv[0], inv[1], inv[2], inv[3], ag_cob);
+			///printf("%lli) %i, %i, %i, %i\n", g->iterations, inv[0], inv[1], inv[2], inv[3]);
 			fflush(stdout);
 			last_report = now;
 			max_found = false;
 		}
+
+
 		/* Find rightmost i < N-1 with a[i] > 0 */
 		i = n_channels - 2;
-		//printf("before rightmost find: %i\n", i);
 		tmp = *t;
 		while(tmp->n < n_channels - 1)
 		{
 			tmp = tmp->next;			
 		}
-		//printf("%i\n",tmp->n);
 		int min = tmp->min;
-		while(i >= 0 && (inv[i] == 0 || inv[i] < min + acc))
+		while(i >= 0 && (inv[i] == 0 || inv[i] <= min))
 		{
-			//printf("does it even enter the loop??\n");
 			i--;
 			int c = 0;
 			tmp = *t;
@@ -272,7 +263,7 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			}
 			min = tmp->min;
 		}
-		//printf("after rightmost find: %i\n", i);
+		//printf("rightmost: %i with min: %i\n", i, (int) tmp->min);
 		/* If none found, we are done */
 		if(i < 0)
 			break;
@@ -282,34 +273,41 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 		{
 			tmp = tmp->next;
 		}
-		//printf("channel n is %i\n", tmp->n);
-		if(inv[i] - acc >= tmp->min)
-			inv[i] = inv[i] - acc;
+		if(inv[i] - g->grn >= tmp->min)
+		{
+			//printf("removing %i from channel %i\n",g->grn, i);
+			inv[i] = inv[i] - g->grn;
+		}
 		else
 		{
+			//printf("not allowed. Skip\n");
 			g->iterations++;
 			continue;
 		}
 		/* Collect all dollars to the right */
 		sum = 0;
 		j = i + 1;
+		//printf("beginning at %i:\n", j);
 		tmp = tmp->next;
 		while(j < n_channels)
 		{
-			sum += inv[j] - tmp->min;
+			sum += inv[j];
+			sum -= tmp->min;
 			inv[j] = tmp->min;
+			//printf("collecting %i - %i from channel %i (n = %i)\n", inv[j], (int) tmp->min, j, tmp->n);
 			tmp = tmp->next;
 			j++;
 		}
+		//printf("%i dollars collected\n", sum);
         /* Give collected dollars + 1 to a[i+1] */
-		if (i + 1 < n_channels)
-			inv[i+1] = sum + acc;
+		inv[i+1] += sum + g->grn;
+		//printf("channel %i now has %i\n", i+1, inv[i+1]);
 		g->iterations++;
 	}
 	//merge_sort(t, cmp_notcob_asc);
 	//display_channels(*t, NULL);
 	//exit(0);
-	printf("found it!!!  coberture = %Lf, 2nd tier = %LF\ntotal number of combinations checked: %lld\n", g->max, g->max_snd, g->iterations);
+	printf("found it!!! displaying solution...\n");
 	display_channels(opt, g);
 	free(inv);
 	return(opt);

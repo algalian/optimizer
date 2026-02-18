@@ -3,17 +3,19 @@
 #include "optimizer.h"
 
 
-int parse_long_double(const char *s,
-                      long double *out,
-                      const char *col_name)
+int parse_long_double(const char *s, long double *out, const char *col_name)
 {
     char *end;
     long double val;
 
-    if (!s || *s == '\0') {
-        fprintf(stderr,
-                "Error: empty numeric field (column '%s')\n",
-                 col_name);
+    if (!s || *s == '\0') 
+    {
+        if(strcmp("Inversión", col_name) == 0)
+        {
+            *out = 0;
+            return(0);
+        }
+        fprintf(stderr, "Error: empty numeric field (column '%s')\n", col_name);
         return -1;
     }
 

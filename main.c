@@ -190,7 +190,8 @@ int main(int argc, char **argv)
 		"Channel",             
 		"Corr Dupl",   
 		"Universo 000",      
-		"Simulador", 
+		"Simulador",
+        "Inversión",
 		NULL
 	};
     if (argc > 3)

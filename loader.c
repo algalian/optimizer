@@ -65,7 +65,7 @@ static int try_load_universe(char **row,
 	if(strcmp(needle, "Presupuesto") == 0)
 	{
 		if (parse_long_double(row[col + 1],
-						 &g->budget,
+						  (&g->budget),
 						  
 						  "Presupuesto") != 0)
 		return -1;
@@ -224,7 +224,10 @@ while (1)
 	header = NULL;
 	hcount = 0;
 	j++;
+	
 }
+
+
 //printf("rows found\n");
 	/* -------- MAP COLUMNS -------- */
 	if (build_colmap(map, header, hcount, fields) != 0) 

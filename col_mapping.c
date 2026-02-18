@@ -17,7 +17,6 @@ int build_colmap(t_colmap *map, char **header, int hcount, char **fields)
     map->c       = find_col(header, hcount, fields[2]);
     map->cpm     = find_col(header, hcount, fields[3]);
     map->min     = find_col(header, hcount, fields[8]);
-
     //printf("%i %i %i %i %i\n", map->name, map->a, map->b, map->c, map->cpm);
     /* validate all are found */
     if (map->name < 0 ||

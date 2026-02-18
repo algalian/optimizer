@@ -62,6 +62,7 @@ typedef struct globals
     long double alpha;
     long double beta;
     long double universe;
+    int grn;
     long double acc;
     long double budget;
     int has_universo;
