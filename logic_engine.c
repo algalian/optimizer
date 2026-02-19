@@ -264,9 +264,11 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			min = tmp->min;
 		}
 		//printf("rightmost: %i with min: %i\n", i, (int) tmp->min);
+
 		/* If none found, we are done */
 		if(i < 0)
 			break;
+
         /* Take one dollar from a[i] */
 		tmp = *t;
 		while(tmp->n != i + 1)
@@ -284,6 +286,7 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			g->iterations++;
 			continue;
 		}
+
 		/* Collect all dollars to the right */
 		sum = 0;
 		j = i + 1;
@@ -299,6 +302,8 @@ t_channel *logic_engine(t_channel **t, t_globals *g)
 			j++;
 		}
 		//printf("%i dollars collected\n", sum);
+
+		
         /* Give collected dollars + 1 to a[i+1] */
 		inv[i+1] += sum + g->grn;
 		//printf("channel %i now has %i\n", i+1, inv[i+1]);
